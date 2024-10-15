@@ -23,7 +23,11 @@ private:
     Ui::MainWindow *ui;
 signals:
     void setCenterPosition(QVariant,QVariant);
+    void setLocationMarking(QVariant,QVariant);
+     void drawPathWithCoordinates(QVariant coordinates);
 public slots:
+    void getRoute(double startLat,double startLong,double endLat,double endLong);
     void startRouteSimulation();  // Add this line
+     void generateRandomRoads(int numberOfRoads);  // Slot to generate random roads
 };
 #endif // MAINWINDOW_H

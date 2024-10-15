@@ -29,5 +29,14 @@ private:
 signals:
     void setCenterPosition(QVariant,QVariant);
     void setLocationMarking(QVariant,QVariant);
+
+    //dissiner le chemin
+    //void drawPathBetweenMarkers(QVariantList pathCoordinates);
+    void drawPathWithCoordinates(QVariant coordinates);
+
+
+
+public slots:
+    void getRoute(double startLat, double startLong, double endLat, double endLong);
 };
 #endif // MAINWINDOW_H

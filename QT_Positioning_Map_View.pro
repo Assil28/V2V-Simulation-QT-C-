@@ -1,5 +1,4 @@
-QT       += core gui
-QT += quickwidgets quick
+QT += core gui widgets quickwidgets positioning location
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -26,3 +25,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     Maps.qrc
+
+DISTFILES += \
+    car-svgrepo-com - Copy.svg

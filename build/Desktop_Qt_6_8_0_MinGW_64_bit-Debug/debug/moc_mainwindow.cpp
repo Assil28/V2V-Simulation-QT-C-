@@ -43,7 +43,7 @@ constexpr auto qt_meta_stringdata_CLASSMainWindowENDCLASS = QtMocHelpers::string
     "setCenterPosition",
     "",
     "QVariant",
-    "setLocationMarking"
+    "startRouteSimulation"
 );
 #else  // !QT_MOC_HAS_STRINGDATA
 #error "qtmochelpers.h not found or too old."
@@ -61,15 +61,19 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSMainWindowENDCLASS[] = {
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       2,       // signalCount
+       1,       // signalCount
 
  // signals: name, argc, parameters, tag, flags, initial metatype offsets
        1,    2,   26,    2, 0x06,    1 /* Public */,
-       4,    2,   31,    2, 0x06,    4 /* Public */,
+
+ // slots: name, argc, parameters, tag, flags, initial metatype offsets
+       4,    0,   31,    2, 0x0a,    4 /* Public */,
 
  // signals: parameters
     QMetaType::Void, 0x80000000 | 3, 0x80000000 | 3,    2,    2,
-    QMetaType::Void, 0x80000000 | 3, 0x80000000 | 3,    2,    2,
+
+ // slots: parameters
+    QMetaType::Void,
 
        0        // eod
 };
@@ -87,10 +91,8 @@ Q_CONSTINIT const QMetaObject MainWindow::staticMetaObject = { {
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         QtPrivate::TypeAndForceComplete<QVariant, std::false_type>,
         QtPrivate::TypeAndForceComplete<QVariant, std::false_type>,
-        // method 'setLocationMarking'
-        QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        QtPrivate::TypeAndForceComplete<QVariant, std::false_type>,
-        QtPrivate::TypeAndForceComplete<QVariant, std::false_type>
+        // method 'startRouteSimulation'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>
     >,
     nullptr
 } };
@@ -102,7 +104,7 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         (void)_t;
         switch (_id) {
         case 0: _t->setCenterPosition((*reinterpret_cast< std::add_pointer_t<QVariant>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<QVariant>>(_a[2]))); break;
-        case 1: _t->setLocationMarking((*reinterpret_cast< std::add_pointer_t<QVariant>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<QVariant>>(_a[2]))); break;
+        case 1: _t->startRouteSimulation(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -111,13 +113,6 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
             using _t = void (MainWindow::*)(QVariant , QVariant );
             if (_t _q_method = &MainWindow::setCenterPosition; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
                 *result = 0;
-                return;
-            }
-        }
-        {
-            using _t = void (MainWindow::*)(QVariant , QVariant );
-            if (_t _q_method = &MainWindow::setLocationMarking; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
-                *result = 1;
                 return;
             }
         }
@@ -159,12 +154,5 @@ void MainWindow::setCenterPosition(QVariant _t1, QVariant _t2)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t2))) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
-}
-
-// SIGNAL 1
-void MainWindow::setLocationMarking(QVariant _t1, QVariant _t2)
-{
-    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t2))) };
-    QMetaObject::activate(this, &staticMetaObject, 1, _a);
 }
 QT_WARNING_POP

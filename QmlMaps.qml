@@ -3,10 +3,14 @@ import QtLocation 6.8
 import QtQuick.Controls 2.15
 import QtPositioning 6.8
 
+import QtQuick.Layouts 1.15
+import QtQuick.Shapes 1.15
+
 Rectangle {
     id: window
     width: 800
     height: 600
+
 
     property double latitude: 47.7508
     property double longitude: 7.3359
@@ -23,69 +27,16 @@ Rectangle {
         id: mapview
         anchors.fill: parent
         plugin: googlemapview
-        center: QtPositioning.coordinate(latitude, longitude)
+        center: QtPositioning.coordinate(window.latitude, window.longitude)
         zoomLevel: 17 // Bind zoomLevel to the Map's zoom level
 
-        MouseArea {
-            anchors.fill: parent
-            drag.target: mapview
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
 
-            onPressed: {
-                // Store the position where the mouse is pressed
-                drag.startX = mouse.x;
-                drag.startY = mouse.y;
-            }
-
-            onReleased: {
-                // Stop panning
-                mapview.panTo(mapview.center);
-            }
-
-            onPositionChanged: {
-                if (drag.active) {
-                    // Calculate the new center based on mouse drag
-                    var deltaLatitude = (mouseY - drag.startY) * 0.0001; // Adjust sensitivity
-                    var deltaLongitude = (mouseX - drag.startX) * 0.0001; // Adjust sensitivity
-                    mapview.center = QtPositioning.coordinate(latitude + deltaLatitude, longitude - deltaLongitude);
-                }
-            }
-
-            // Handle double-click for zooming
-            onDoubleClicked: {
-                zoomLevel += 1; // Zoom in
-                mapview.zoomLevel = zoomLevel; // Update the map's zoom level
-            }
-
-            // Handle mouse wheel for zooming
-            onWheel: function(event) {
-                if (event.angleDelta.y > 0) {
-                    zoomLevel += 1; // Zoom in
-                } else {
-                    zoomLevel -= 1; // Zoom out
-                }
-                mapview.zoomLevel = zoomLevel; // Update the map's zoom level
-            }
-        }
     }
 
     function setCenterPosition(lati, longi) {
         mapview.pan(latitude - lati, longitude - longi);
         latitude = lati;
         longitude = longi;
-    }
-
-    function setLocationMarking(lati, longi) {
-        console.log("Setting marker at: ", lati, longi);
-        var item = locationmarker.createObject(window, {
-            coordinate: QtPositioning.coordinate(lati, longi)
-        });
-        if (item) {
-            mapview.addMapItem(item);
-            console.log("Marker created successfully.");
-        } else {
-            console.log("Failed to create marker.");
-        }
     }
 
     // Position the marker at the location
@@ -110,4 +61,82 @@ Rectangle {
         anchors.fill: parent
         z: 1  // Ensure it is above the map
     }
+    // New property for the car
+        property var carMarker: null
+
+        // Function to create the car marker
+        function createCarMarker(lat, lon) {
+            if (carMarker === null) {
+                carMarker = carMarkerComponent.createObject(mapview, {
+                    coordinate: QtPositioning.coordinate(lat, lon)
+                })
+                mapview.addMapItem(carMarker)
+            } else {
+                carMarker.coordinate = QtPositioning.coordinate(lat, lon)
+            }
+        }
+
+        // Component for the car marker
+        Component {
+            id: carMarkerComponent
+            MapQuickItem {
+                id: carMarker
+                anchorPoint.x: image.width / 2
+                anchorPoint.y: image.height
+                sourceItem: Image {
+                    id: carImage
+                    width: 30
+                    height: 30
+                    source: "qrc:/car.svg" // Ensure this points to your car SVG
+                }
+            }
+        }
+
+
+        // Function to simulate car movement
+        function simulateCarMovement(path) {
+            let index = 0
+            let timer = Qt.createQmlObject("import QtQml 2.15; Timer {}", window)
+            timer.interval = 100 // Adjust for speed
+            timer.repeat = true
+            timer.triggered.connect(function() {
+                if (index < path.length) {
+                    let point = path[index]
+                    createCarMarker(point.latitude, point.longitude)
+                    index++
+                } else {
+                    timer.stop()
+                }
+            })
+            timer.start()
+        }
+
+        // Function to request route
+        function requestRoute(startLat, startLon, endLat, endLon) {
+            let routeQuery = Qt.createQmlObject('import QtLocation 6.8; RouteQuery {}', window)
+            routeQuery.addWaypoint(QtPositioning.coordinate(startLat, startLon))
+            routeQuery.addWaypoint(QtPositioning.coordinate(endLat, endLon))
+            routeQuery.travelModes = RouteQuery.CarTravel
+            routeQuery.routeOptimizations = RouteQuery.FastestRoute
+
+            let routeModel = Qt.createQmlObject('import QtLocation 6.8; RouteModel {}', window)
+            routeModel.plugin = googlemapview
+            routeModel.query = routeQuery
+
+            routeModel.statusChanged.connect(function() {
+                if (routeModel.status == RouteModel.Ready) {
+                    if (routeModel.count > 0) {
+                        let route = routeModel.get(0).path
+                        simulateCarMovement(route)
+                    }
+                }
+            })
+
+            routeModel.update()
+        }
+
+        // Call this function to start the simulation
+        Component.onCompleted: {
+            requestRoute(47.752739, 7.336979, 47.750983, 7.331639)
+        }
 }

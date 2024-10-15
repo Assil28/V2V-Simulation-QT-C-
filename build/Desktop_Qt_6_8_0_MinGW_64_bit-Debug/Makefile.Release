@@ -105,6 +105,7 @@ compiler_rcc_clean:
 release/qrc_Maps.cpp: ../../Maps.qrc \
 		D:/QT/6.8.0/mingw_64/bin/rcc.exe \
 		../../HexagonalGrid.qml \
+		../../car.svg \
 		../../QmlMaps.qml
 	D:\QT\6.8.0\mingw_64\bin\rcc.exe -name Maps --no-zstd ..\..\Maps.qrc -o release\qrc_Maps.cpp
 

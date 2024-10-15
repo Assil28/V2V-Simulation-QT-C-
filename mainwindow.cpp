@@ -9,6 +9,9 @@
 #include <QGeoCoordinate>
 #include <QtPositioning>
 
+#include <cstdlib> // For random generation
+#include <ctime>   // For seeding the random generator
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -33,22 +36,52 @@ MainWindow::MainWindow(QWidget *parent)
     // Set initial map center (Mulhouse)
     emit setCenterPosition(47.729679, 7.321515);
 
-    // Add markers for start and end points
-    emit setLocationMarking(47.729679, 7.321515);  // Starting point of the first route
-    emit setLocationMarking(47.7316239, 7.3095028);  // Ending point of the first route
+    // Seed the random generator
+    std::srand(std::time(0));
 
-    // Fetch and draw the first route automatically
-    getRoute(47.729679, 7.321515, 47.7316239, 7.3095028);
+    // Generate random roads
+    generateRandomRoads(3);  // Generate 3 random roads
+}
 
-    // Add another route
-    emit setLocationMarking(47.738000, 7.320000);  // Starting point of the second route
-    emit setLocationMarking(47.740000, 7.325000);  // Ending point of the second route
+void MainWindow::generateRandomRoads(int numberOfRoads) {
+    // Approximate bounding box for Mulhouse
+    constexpr double MIN_LAT = 47.7200;
+    constexpr double MAX_LAT = 47.7700;
+    constexpr double MIN_LONG = 7.3000;
+    constexpr double MAX_LONG = 7.3500;
+    constexpr double MIN_DISTANCE = 0.01; // Minimum distance between start and end points (about 1 km)
 
-    // Fetch and draw the second route automatically
-    getRoute(47.738000, 7.320000, 47.740000, 7.325000);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> lat_dist(MIN_LAT, MAX_LAT);
+    std::uniform_real_distribution<> long_dist(MIN_LONG, MAX_LONG);
 
-     getRoute(47.729679, 7.321515,47.738000, 7.320000);
+    for (int i = 0; i < numberOfRoads; i++) {
+        double startLat, startLong, endLat, endLong;
+        double distance;
 
+        do {
+            // Generate random start coordinates
+            startLat = lat_dist(gen);
+            startLong = long_dist(gen);
+
+            // Generate random end coordinates
+            endLat = lat_dist(gen);
+            endLong = long_dist(gen);
+
+            // Calculate distance between start and end points
+            distance = std::sqrt(std::pow((endLat - startLat) * 111.32, 2) +
+                                 std::pow((endLong - startLong) * 111.32 * std::cos(startLat * M_PI / 180.0), 2));
+
+        } while (distance < MIN_DISTANCE); // Ensure minimum distance is met
+
+        // Add markers for start and end points
+        emit setLocationMarking(startLat, startLong);  // Starting point of the route
+        emit setLocationMarking(endLat, endLong);      // Ending point of the route
+
+        // Fetch and draw the route automatically
+        getRoute(startLat, startLong, endLat, endLong);
+    }
 }
 
 MainWindow::~MainWindow()

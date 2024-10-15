@@ -60,21 +60,21 @@ Rectangle {
                         }
                     }
 
-                    // Handle double-click for zooming
-                              /* onDoubleClicked: {
-                                   zoomLevel += 1; // Zoom in
-                                   mapview.zoomLevel = zoomLevel; // Update the map's zoom level
-                               }
+                    //Handle double-click for zooming
+                       onDoubleClicked: {
+                           zoomLevel += 1; // Zoom in
+                           mapview.zoomLevel = zoomLevel; // Update the map's zoom level
+                       }
 
-                               // Handle mouse wheel for zooming
-                               onWheel: function(event) {
-                                   if (event.angleDelta.y > 0) {
-                                       zoomLevel += 1; // Zoom in
-                                   } else {
-                                       zoomLevel -= 1; // Zoom out
-                                   }
-                                   mapview.zoomLevel = zoomLevel; // Update the map's zoom level
-                               }*/
+                       // Handle mouse wheel for zooming
+                       onWheel: function(event) {
+                           if (event.angleDelta.y > 0) {
+                               zoomLevel += 1; // Zoom in
+                           } else {
+                               zoomLevel -= 1; // Zoom out
+                           }
+                           mapview.zoomLevel = zoomLevel; // Update the map's zoom level
+                       }
                 }
             }
 
@@ -97,18 +97,28 @@ Rectangle {
     // Draw the path using the coordinates from the backend
 
     function drawPathWithCoordinates(coordinates) {
-        // Créer une nouvelle MapPolyline pour chaque chemin
-        var newPolyline = Qt.createQmlObject('import QtLocation 5.0; MapPolyline { line.width: 5; line.color: "blue"; path: [] }', mapview);
+        // Create the first polyline (thicker and transparent, for the center of the road)
+        var transparentPolyline = Qt.createQmlObject('import QtLocation 5.0; MapPolyline { line.width: 10; line.color: "blue"; path: [] }', mapview);
 
-        // Ajouter les nouvelles coordonnées à cette polyligne
+        // Add coordinates to the transparent polyline
         for (var i = 0; i < coordinates.length; i++) {
-            newPolyline.path.push(coordinates[i]);
+            transparentPolyline.path.push(coordinates[i]);
         }
 
-        // Ajouter la nouvelle polyligne à la carte
-        mapview.addMapItem(newPolyline);
-    }
+        // Add the transparent polyline to the map
+        mapview.addMapItem(transparentPolyline);
 
+        // Create the second polyline (thinner and blue, for the borders of the road)
+        var borderPolyline = Qt.createQmlObject('import QtLocation 5.0; MapPolyline { line.width: 5; line.color: "white"; path: [] }', mapview);
+
+        // Add coordinates to the blue polyline (borders)
+        for (var i = 0; i < coordinates.length; i++) {
+            borderPolyline.path.push(coordinates[i]);
+        }
+
+        // Add the blue border polyline to the map
+        mapview.addMapItem(borderPolyline);
+    }
 
 
 

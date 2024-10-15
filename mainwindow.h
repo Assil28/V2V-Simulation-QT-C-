@@ -25,6 +25,7 @@ public:
 private:
     Ui::MainWindow *ui;
 
+
 //ajouter
 signals:
     void setCenterPosition(QVariant,QVariant);
@@ -38,5 +39,8 @@ signals:
 
 public slots:
     void getRoute(double startLat, double startLong, double endLat, double endLong);
+
+    // Declaration of the new function to generate random roads
+    void generateRandomRoads(int numberOfRoads);  // Slot to generate random roads
 };
 #endif // MAINWINDOW_H

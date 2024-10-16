@@ -33,23 +33,33 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, SIGNAL(drawPathWithCoordinates(QVariant)),
             rootObject, SLOT(drawPathWithCoordinates(QVariant)));
 
+    // Connect the moveCarToPosition signal to the car marker's move function
+
+    connect(this, SIGNAL(animateCarAlongPath(QVariant)),
+            rootObject, SLOT(animateCarAlongPath(QVariant)));
+
+
     // Set initial map center (Mulhouse)
     emit setCenterPosition(47.729679, 7.321515);
 
     // Seed the random generator
     std::srand(std::time(0));
 
+
+
     // Generate random roads
     generateRandomRoads(3);  // Generate 3 random roads
+
+    QTimer::singleShot(1000, this, &MainWindow::selectAndAnimateRoad);
+
 }
 
 void MainWindow::generateRandomRoads(int numberOfRoads) {
-    // Approximate bounding box for Mulhouse
     constexpr double MIN_LAT = 47.7200;
     constexpr double MAX_LAT = 47.7700;
     constexpr double MIN_LONG = 7.3000;
     constexpr double MAX_LONG = 7.3500;
-    constexpr double MIN_DISTANCE = 0.01; // Minimum distance between start and end points (about 1 km)
+    constexpr double MIN_DISTANCE = 0.01;
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -61,25 +71,17 @@ void MainWindow::generateRandomRoads(int numberOfRoads) {
         double distance;
 
         do {
-            // Generate random start coordinates
             startLat = lat_dist(gen);
             startLong = long_dist(gen);
-
-            // Generate random end coordinates
             endLat = lat_dist(gen);
             endLong = long_dist(gen);
-
-            // Calculate distance between start and end points
             distance = std::sqrt(std::pow((endLat - startLat) * 111.32, 2) +
                                  std::pow((endLong - startLong) * 111.32 * std::cos(startLat * M_PI / 180.0), 2));
+        } while (distance < MIN_DISTANCE);
 
-        } while (distance < MIN_DISTANCE); // Ensure minimum distance is met
+        emit setLocationMarking(startLat, startLong);
+        emit setLocationMarking(endLat, endLong);
 
-        // Add markers for start and end points
-        emit setLocationMarking(startLat, startLong);  // Starting point of the route
-        emit setLocationMarking(endLat, endLong);      // Ending point of the route
-
-        // Fetch and draw the route automatically
         getRoute(startLat, startLong, endLat, endLong);
     }
 }
@@ -93,35 +95,20 @@ void MainWindow::getRoute(double startLat, double startLong, double endLat, doub
 {
     QNetworkAccessManager *manager = new QNetworkAccessManager(this);
 
-    // Create URL for the request
     QString url = QString("http://router.project-osrm.org/route/v1/driving/%1,%2;%3,%4?overview=full&geometries=geojson")
                       .arg(startLong).arg(startLat).arg(endLong).arg(endLat);
 
-    // Create and send the network request
-    // Validate the URL before creating the request
     QUrl requestUrl(url);
     if (!requestUrl.isValid()) {
         qDebug() << "Invalid URL:" << url;
-        return;  // Abort if the URL is invalid
+        return;
     }
 
     QNetworkRequest request(requestUrl);
-    QNetworkReply *reply = manager->get(request);  // Proceed with valid request
+    QNetworkReply *reply = manager->get(request);
 
-    // Log the request URL for debugging purposes
     qDebug() << "Requesting URL:" << requestUrl.toString();
 
-    connect(reply, &QNetworkReply::finished, this, [=]() {
-        if (reply->error() == QNetworkReply::NoError) {
-            // Handle response data here
-        } else {
-            qDebug() << "Network error:" << reply->errorString();
-        }
-        reply->deleteLater();  // Make sure to clean up the reply after processing
-    });
-
-
-    // Handle the response when finished
     connect(reply, &QNetworkReply::finished, this, [=]() {
         if (reply->error() == QNetworkReply::NoError) {
             QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll());
@@ -133,16 +120,16 @@ void MainWindow::getRoute(double startLat, double startLong, double endLat, doub
                 QJsonObject geometry = route["geometry"].toObject();
                 QJsonArray coordinates = geometry["coordinates"].toArray();
 
-                QVariantList pathCoordinates;
+                QList<QGeoCoordinate> geoPathCoordinates;  // Create a QList<QGeoCoordinate>
                 for (const QJsonValue &coord : coordinates) {
                     QJsonArray coordPair = coord.toArray();
                     double lon = coordPair[0].toDouble();
                     double lat = coordPair[1].toDouble();
-                    pathCoordinates.append(QVariant::fromValue(QGeoCoordinate(lat, lon)));
+                    geoPathCoordinates.append(QGeoCoordinate(lat, lon));  // Append QGeoCoordinate directly
                 }
 
-                qDebug() << "Path coordinates:" << pathCoordinates;
-                emit drawPathWithCoordinates(QVariant::fromValue(pathCoordinates));
+                generatedRoads.append(geoPathCoordinates);  // Append the QList<QGeoCoordinate>
+                emit drawPathWithCoordinates(QVariant::fromValue(geoPathCoordinates));  // Convert to QVariantList for signaling
             } else {
                 qDebug() << "No routes found in response.";
             }
@@ -152,4 +139,22 @@ void MainWindow::getRoute(double startLat, double startLong, double endLat, doub
 
         reply->deleteLater();
     });
+}
+
+void MainWindow::selectAndAnimateRoad()
+{
+    if (!generatedRoads.isEmpty()) {
+        // Select a random road
+        int selectedRoadIndex = std::rand() % generatedRoads.size();
+        QList<QGeoCoordinate> selectedRoadCoordinates = generatedRoads[selectedRoadIndex];
+
+        // Convert QList<QGeoCoordinate> to QVariantList
+        QVariantList selectedRoad;
+        for (const QGeoCoordinate &coord : selectedRoadCoordinates) {
+            selectedRoad.append(QVariant::fromValue(coord));
+        }
+
+        // Animate the car along the selected road
+        emit animateCarAlongPath(QVariant::fromValue(selectedRoad));
+    }
 }

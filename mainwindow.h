@@ -7,6 +7,7 @@
 #include <QtCore>
 #include <QtGui>
 #include <QtQuick>
+#include <QGeoCoordinate>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -24,7 +25,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
-
+    QList<QList<QGeoCoordinate>> generatedRoads;
 
 //ajouter
 signals:
@@ -32,15 +33,18 @@ signals:
     void setLocationMarking(QVariant,QVariant);
 
     //dissiner le chemin
-    //void drawPathBetweenMarkers(QVariantList pathCoordinates);
     void drawPathWithCoordinates(QVariant coordinates);
 
-
+    //For the Car
+    void animateCarAlongPath(QVariant coordinates);
 
 public slots:
     void getRoute(double startLat, double startLong, double endLat, double endLong);
 
     // Declaration of the new function to generate random roads
     void generateRandomRoads(int numberOfRoads);  // Slot to generate random roads
+
+//For the car
+    void selectAndAnimateRoad();
 };
 #endif // MAINWINDOW_H

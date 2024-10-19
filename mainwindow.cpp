@@ -32,15 +32,17 @@ MainWindow::MainWindow(QWidget *parent)
             rootObject, SLOT(drawPathWithCoordinates(QVariant)));
     connect(this, SIGNAL(addCarPath(QVariant)),
             rootObject, SLOT(addCarPath(QVariant)));
-
     connect(this, SIGNAL(clearMap()),
-            rootObject, SLOT(clearMap()));  // Connecter le signal pour effacer la carte
+            rootObject, SLOT(clearMap()));
+    connect(this, SIGNAL(togglePauseSimulation()),
+            rootObject, SLOT(togglePauseSimulation()));
 
-
-    // connecter les deux bouttons et slider
+    // Connect buttons and slider
     connect(ui->pushButton_2, &QPushButton::clicked, this, &MainWindow::onStartSimulationClicked);
     connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::onRestartClicked);
+    connect(ui->pauseButton, &QPushButton::clicked, this, &MainWindow::onPauseButtonClicked);
     connect(ui->horizontalSlider, &QSlider::valueChanged, this, &MainWindow::onSliderValueChanged);
+
 
 
     emit setCenterPosition(47.729679, 7.321515);
@@ -62,12 +64,33 @@ void MainWindow::onStartSimulationClicked() {
     // Ajouter ici votre logique pour démarrer la simulation
     generateRandomRoads(5);
 }
+void MainWindow::onPauseButtonClicked() {
+    emit togglePauseSimulation();
+
+    // Optional: Update button text
+    QObject *rootObject = ui->quickWidget_MapView->rootObject();
+    QVariant returnedValue;
+    QMetaObject::invokeMethod(rootObject, "isSimulationPaused",
+                              Q_RETURN_ARG(QVariant, returnedValue));
+    bool simulationPaused = returnedValue.toBool();
+
+    if (simulationPaused) {
+        ui->pauseButton->setText("Resume");
+    } else {
+        ui->pauseButton->setText("Pause");
+    }
+}
 
 // Slot pour redémarrer
 void MainWindow::onRestartClicked() {
     qDebug() << "Redémarrage de la simulation";
     // Ajouter ici votre logique pour redémarrer la simulation
 
+    // Clear the map
+    generatedRoads.clear();
+    emit clearMap();
+    // Generate new roads
+    // generateRandomRoads(5);
 
 }
 

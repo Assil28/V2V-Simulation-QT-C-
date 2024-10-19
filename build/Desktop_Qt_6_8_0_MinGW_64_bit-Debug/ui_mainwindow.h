@@ -30,6 +30,7 @@ public:
     QWidget *horizontalLayoutWidget;
     QHBoxLayout *horizontalLayout;
     QPushButton *pushButton_2;
+    QPushButton *pauseButton;
     QSlider *horizontalSlider;
     QPushButton *pushButton;
     QMenuBar *menubar;
@@ -48,7 +49,7 @@ public:
         quickWidget_MapView->setResizeMode(QQuickWidget::ResizeMode::SizeRootObjectToView);
         horizontalLayoutWidget = new QWidget(centralwidget);
         horizontalLayoutWidget->setObjectName("horizontalLayoutWidget");
-        horizontalLayoutWidget->setGeometry(QRect(350, 0, 581, 41));
+        horizontalLayoutWidget->setGeometry(QRect(100, 0, 331, 31));
         horizontalLayout = new QHBoxLayout(horizontalLayoutWidget);
         horizontalLayout->setObjectName("horizontalLayout");
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
@@ -56,6 +57,11 @@ public:
         pushButton_2->setObjectName("pushButton_2");
 
         horizontalLayout->addWidget(pushButton_2);
+
+        pauseButton = new QPushButton(horizontalLayoutWidget);
+        pauseButton->setObjectName("pauseButton");
+
+        horizontalLayout->addWidget(pauseButton);
 
         horizontalSlider = new QSlider(horizontalLayoutWidget);
         horizontalSlider->setObjectName("horizontalSlider");
@@ -71,7 +77,7 @@ public:
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName("menubar");
-        menubar->setGeometry(QRect(0, 0, 1451, 26));
+        menubar->setGeometry(QRect(0, 0, 1451, 19));
         MainWindow->setMenuBar(menubar);
         statusbar = new QStatusBar(MainWindow);
         statusbar->setObjectName("statusbar");
@@ -86,7 +92,8 @@ public:
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
         pushButton_2->setText(QCoreApplication::translate("MainWindow", "Demarrer la simulation", nullptr));
-        pushButton->setText(QCoreApplication::translate("MainWindow", "Restart", nullptr));
+        pauseButton->setText(QCoreApplication::translate("MainWindow", "Pause", nullptr));
+        pushButton->setText(QCoreApplication::translate("MainWindow", "nettoyer la map", nullptr));
     } // retranslateUi
 
 };

@@ -29,12 +29,16 @@ signals:
     void setLocationMarking(QVariant, QVariant);
     void drawPathWithCoordinates(QVariant coordinates);
     void addCarPath(QVariant coordinates);
+    void clearMap();
+    void togglePauseSimulation();  // Added signal
+
 public slots:
     void getRoute(double startLat, double startLong, double endLat, double endLong);
     void generateRandomRoads(int numberOfRoads);
 
     void onStartSimulationClicked();
     void onRestartClicked();
+    void onPauseButtonClicked();  // Added slot
     void onSliderValueChanged(int value);
 };
 #endif // MAINWINDOW_H

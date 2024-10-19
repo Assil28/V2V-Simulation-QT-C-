@@ -47,6 +47,8 @@ constexpr auto qt_meta_stringdata_CLASSMainWindowENDCLASS = QtMocHelpers::string
     "drawPathWithCoordinates",
     "coordinates",
     "addCarPath",
+    "clearMap",
+    "togglePauseSimulation",
     "getRoute",
     "startLat",
     "startLong",
@@ -56,6 +58,7 @@ constexpr auto qt_meta_stringdata_CLASSMainWindowENDCLASS = QtMocHelpers::string
     "numberOfRoads",
     "onStartSimulationClicked",
     "onRestartClicked",
+    "onPauseButtonClicked",
     "onSliderValueChanged",
     "value"
 );
@@ -70,38 +73,44 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSMainWindowENDCLASS[] = {
       12,       // revision
        0,       // classname
        0,    0, // classinfo
-       9,   14, // methods
+      12,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       4,       // signalCount
+       6,       // signalCount
 
  // signals: name, argc, parameters, tag, flags, initial metatype offsets
-       1,    2,   68,    2, 0x06,    1 /* Public */,
-       4,    2,   73,    2, 0x06,    4 /* Public */,
-       5,    1,   78,    2, 0x06,    7 /* Public */,
-       7,    1,   81,    2, 0x06,    9 /* Public */,
+       1,    2,   86,    2, 0x06,    1 /* Public */,
+       4,    2,   91,    2, 0x06,    4 /* Public */,
+       5,    1,   96,    2, 0x06,    7 /* Public */,
+       7,    1,   99,    2, 0x06,    9 /* Public */,
+       8,    0,  102,    2, 0x06,   11 /* Public */,
+       9,    0,  103,    2, 0x06,   12 /* Public */,
 
  // slots: name, argc, parameters, tag, flags, initial metatype offsets
-       8,    4,   84,    2, 0x0a,   11 /* Public */,
-      13,    1,   93,    2, 0x0a,   16 /* Public */,
-      15,    0,   96,    2, 0x0a,   18 /* Public */,
-      16,    0,   97,    2, 0x0a,   19 /* Public */,
-      17,    1,   98,    2, 0x0a,   20 /* Public */,
+      10,    4,  104,    2, 0x0a,   13 /* Public */,
+      15,    1,  113,    2, 0x0a,   18 /* Public */,
+      17,    0,  116,    2, 0x0a,   20 /* Public */,
+      18,    0,  117,    2, 0x0a,   21 /* Public */,
+      19,    0,  118,    2, 0x0a,   22 /* Public */,
+      20,    1,  119,    2, 0x0a,   23 /* Public */,
 
  // signals: parameters
     QMetaType::Void, 0x80000000 | 3, 0x80000000 | 3,    2,    2,
     QMetaType::Void, 0x80000000 | 3, 0x80000000 | 3,    2,    2,
     QMetaType::Void, 0x80000000 | 3,    6,
     QMetaType::Void, 0x80000000 | 3,    6,
+    QMetaType::Void,
+    QMetaType::Void,
 
  // slots: parameters
-    QMetaType::Void, QMetaType::Double, QMetaType::Double, QMetaType::Double, QMetaType::Double,    9,   10,   11,   12,
-    QMetaType::Void, QMetaType::Int,   14,
+    QMetaType::Void, QMetaType::Double, QMetaType::Double, QMetaType::Double, QMetaType::Double,   11,   12,   13,   14,
+    QMetaType::Void, QMetaType::Int,   16,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::Int,   18,
+    QMetaType::Void,
+    QMetaType::Void, QMetaType::Int,   21,
 
        0        // eod
 };
@@ -129,6 +138,10 @@ Q_CONSTINIT const QMetaObject MainWindow::staticMetaObject = { {
         // method 'addCarPath'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         QtPrivate::TypeAndForceComplete<QVariant, std::false_type>,
+        // method 'clearMap'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        // method 'togglePauseSimulation'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'getRoute'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         QtPrivate::TypeAndForceComplete<double, std::false_type>,
@@ -141,6 +154,8 @@ Q_CONSTINIT const QMetaObject MainWindow::staticMetaObject = { {
         // method 'onStartSimulationClicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'onRestartClicked'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        // method 'onPauseButtonClicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'onSliderValueChanged'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
@@ -159,11 +174,14 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 1: _t->setLocationMarking((*reinterpret_cast< std::add_pointer_t<QVariant>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<QVariant>>(_a[2]))); break;
         case 2: _t->drawPathWithCoordinates((*reinterpret_cast< std::add_pointer_t<QVariant>>(_a[1]))); break;
         case 3: _t->addCarPath((*reinterpret_cast< std::add_pointer_t<QVariant>>(_a[1]))); break;
-        case 4: _t->getRoute((*reinterpret_cast< std::add_pointer_t<double>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<double>>(_a[2])),(*reinterpret_cast< std::add_pointer_t<double>>(_a[3])),(*reinterpret_cast< std::add_pointer_t<double>>(_a[4]))); break;
-        case 5: _t->generateRandomRoads((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
-        case 6: _t->onStartSimulationClicked(); break;
-        case 7: _t->onRestartClicked(); break;
-        case 8: _t->onSliderValueChanged((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
+        case 4: _t->clearMap(); break;
+        case 5: _t->togglePauseSimulation(); break;
+        case 6: _t->getRoute((*reinterpret_cast< std::add_pointer_t<double>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<double>>(_a[2])),(*reinterpret_cast< std::add_pointer_t<double>>(_a[3])),(*reinterpret_cast< std::add_pointer_t<double>>(_a[4]))); break;
+        case 7: _t->generateRandomRoads((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
+        case 8: _t->onStartSimulationClicked(); break;
+        case 9: _t->onRestartClicked(); break;
+        case 10: _t->onPauseButtonClicked(); break;
+        case 11: _t->onSliderValueChanged((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -196,6 +214,20 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
                 return;
             }
         }
+        {
+            using _t = void (MainWindow::*)();
+            if (_t _q_method = &MainWindow::clearMap; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
+                *result = 4;
+                return;
+            }
+        }
+        {
+            using _t = void (MainWindow::*)();
+            if (_t _q_method = &MainWindow::togglePauseSimulation; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
+                *result = 5;
+                return;
+            }
+        }
     }
 }
 
@@ -218,13 +250,13 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 9)
+        if (_id < 12)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 9;
+        _id -= 12;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 9)
+        if (_id < 12)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 9;
+        _id -= 12;
     }
     return _id;
 }
@@ -255,5 +287,17 @@ void MainWindow::addCarPath(QVariant _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
     QMetaObject::activate(this, &staticMetaObject, 3, _a);
+}
+
+// SIGNAL 4
+void MainWindow::clearMap()
+{
+    QMetaObject::activate(this, &staticMetaObject, 4, nullptr);
+}
+
+// SIGNAL 5
+void MainWindow::togglePauseSimulation()
+{
+    QMetaObject::activate(this, &staticMetaObject, 5, nullptr);
 }
 QT_WARNING_POP

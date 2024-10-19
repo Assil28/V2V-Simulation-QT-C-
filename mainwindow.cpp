@@ -12,7 +12,7 @@
 #include <ctime>
 #include <random>
 
-hhhh
+//hhhh
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)

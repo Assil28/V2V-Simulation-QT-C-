@@ -15,6 +15,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , m_pendingRoads(0)
 {
     ui->setupUi(this);
 
@@ -37,9 +38,6 @@ MainWindow::MainWindow(QWidget *parent)
     std::srand(std::time(0));
 
     generateRandomRoads(5);
-
-    // After generating roads, add cars to all roads
-    QTimer::singleShot(1000, this, &MainWindow::addCarsToAllRoads);
 }
 
 MainWindow::~MainWindow()
@@ -58,6 +56,8 @@ void MainWindow::generateRandomRoads(int numberOfRoads) {
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> lat_dist(MIN_LAT, MAX_LAT);
     std::uniform_real_distribution<> long_dist(MIN_LONG, MAX_LONG);
+
+    m_pendingRoads = numberOfRoads;
 
     for (int i = 0; i < numberOfRoads; i++) {
         double startLat, startLong, endLat, endLong;
@@ -118,6 +118,13 @@ void MainWindow::getRoute(double startLat, double startLong, double endLat, doub
 
                 generatedRoads.append(geoPathCoordinates);
                 emit drawPathWithCoordinates(QVariant::fromValue(geoPathCoordinates));
+
+                // Add a car for this road immediately
+                QVariantList roadCoordinates;
+                for (const QGeoCoordinate &coord : geoPathCoordinates) {
+                    roadCoordinates.append(QVariant::fromValue(coord));
+                }
+                emit addCarPath(QVariant::fromValue(roadCoordinates));
             } else {
                 qDebug() << "No routes found in response.";
             }
@@ -125,17 +132,14 @@ void MainWindow::getRoute(double startLat, double startLong, double endLat, doub
             qDebug() << "Network error:" << reply->errorString();
         }
 
+        m_pendingRoads--;
+        if (m_pendingRoads == 0) {
+            qDebug() << "All roads generated and cars added.";
+        }
+
         reply->deleteLater();
+        manager->deleteLater();
     });
 }
 
-void MainWindow::addCarsToAllRoads()
-{
-    for (const auto &road : generatedRoads) {
-        QVariantList roadCoordinates;
-        for (const QGeoCoordinate &coord : road) {
-            roadCoordinates.append(QVariant::fromValue(coord));
-        }
-        emit addCarPath(QVariant::fromValue(roadCoordinates));
-    }
-}
+// Remove the addCarsToAllRoads() function as it's no longer needed

@@ -12,6 +12,8 @@
 #include <ctime>
 #include <random>
 
+hhhh
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)

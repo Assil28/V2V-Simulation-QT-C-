@@ -33,17 +33,54 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, SIGNAL(addCarPath(QVariant)),
             rootObject, SLOT(addCarPath(QVariant)));
 
+    connect(this, SIGNAL(clearMap()),
+            rootObject, SLOT(clearMap()));  // Connecter le signal pour effacer la carte
+
+
+    // connecter les deux bouttons et slider
+    connect(ui->pushButton_2, &QPushButton::clicked, this, &MainWindow::onStartSimulationClicked);
+    connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::onRestartClicked);
+    connect(ui->horizontalSlider, &QSlider::valueChanged, this, &MainWindow::onSliderValueChanged);
+
+
     emit setCenterPosition(47.729679, 7.321515);
 
     std::srand(std::time(0));
 
-    generateRandomRoads(5);
+    //generateRandomRoads(5);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+/*******************Bouttons et slide bar**********************/
+// Slot pour démarrer la simulation
+void MainWindow::onStartSimulationClicked() {
+    qDebug() << "Démarrer la simulation";
+    // Ajouter ici votre logique pour démarrer la simulation
+    generateRandomRoads(5);
+}
+
+// Slot pour redémarrer
+void MainWindow::onRestartClicked() {
+    qDebug() << "Redémarrage de la simulation";
+    // Ajouter ici votre logique pour redémarrer la simulation
+
+
+}
+
+// Slot pour récupérer la valeur du slider
+void MainWindow::onSliderValueChanged(int value) {
+    qDebug() << "Valeur du slider:" << value;
+    // Utilisez la valeur du slider ici
+}
+
+
+
+/*******************************************/
+
 
 void MainWindow::generateRandomRoads(int numberOfRoads) {
     constexpr double MIN_LAT = 47.7200;

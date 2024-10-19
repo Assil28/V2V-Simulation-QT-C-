@@ -23,6 +23,7 @@ private:
     Ui::MainWindow *ui;
     QList<QList<QGeoCoordinate>> generatedRoads;
     int m_pendingRoads;
+
 signals:
     void setCenterPosition(QVariant, QVariant);
     void setLocationMarking(QVariant, QVariant);
@@ -31,5 +32,9 @@ signals:
 public slots:
     void getRoute(double startLat, double startLong, double endLat, double endLong);
     void generateRandomRoads(int numberOfRoads);
+
+    void onStartSimulationClicked();
+    void onRestartClicked();
+    void onSliderValueChanged(int value);
 };
 #endif // MAINWINDOW_H

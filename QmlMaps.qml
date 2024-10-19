@@ -77,6 +77,10 @@ Rectangle {
                 mapview.zoomLevel = window.zoomLevel;
             }
         }
+
+
+
+
     }
 
     function setCenterPosition(lati, longi) {

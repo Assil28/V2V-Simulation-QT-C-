@@ -12,8 +12,11 @@
 #include <QtCore/QVariant>
 #include <QtQuickWidgets/QQuickWidget>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QSlider>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QWidget>
 
@@ -24,6 +27,11 @@ class Ui_MainWindow
 public:
     QWidget *centralwidget;
     QQuickWidget *quickWidget_MapView;
+    QWidget *horizontalLayoutWidget;
+    QHBoxLayout *horizontalLayout;
+    QPushButton *pushButton_2;
+    QSlider *horizontalSlider;
+    QPushButton *pushButton;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -38,10 +46,32 @@ public:
         quickWidget_MapView->setObjectName("quickWidget_MapView");
         quickWidget_MapView->setGeometry(QRect(-60, -20, 1591, 951));
         quickWidget_MapView->setResizeMode(QQuickWidget::ResizeMode::SizeRootObjectToView);
+        horizontalLayoutWidget = new QWidget(centralwidget);
+        horizontalLayoutWidget->setObjectName("horizontalLayoutWidget");
+        horizontalLayoutWidget->setGeometry(QRect(350, 0, 581, 41));
+        horizontalLayout = new QHBoxLayout(horizontalLayoutWidget);
+        horizontalLayout->setObjectName("horizontalLayout");
+        horizontalLayout->setContentsMargins(0, 0, 0, 0);
+        pushButton_2 = new QPushButton(horizontalLayoutWidget);
+        pushButton_2->setObjectName("pushButton_2");
+
+        horizontalLayout->addWidget(pushButton_2);
+
+        horizontalSlider = new QSlider(horizontalLayoutWidget);
+        horizontalSlider->setObjectName("horizontalSlider");
+        horizontalSlider->setOrientation(Qt::Orientation::Horizontal);
+
+        horizontalLayout->addWidget(horizontalSlider);
+
+        pushButton = new QPushButton(horizontalLayoutWidget);
+        pushButton->setObjectName("pushButton");
+
+        horizontalLayout->addWidget(pushButton);
+
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName("menubar");
-        menubar->setGeometry(QRect(0, 0, 1451, 25));
+        menubar->setGeometry(QRect(0, 0, 1451, 26));
         MainWindow->setMenuBar(menubar);
         statusbar = new QStatusBar(MainWindow);
         statusbar->setObjectName("statusbar");
@@ -55,6 +85,8 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
+        pushButton_2->setText(QCoreApplication::translate("MainWindow", "Demarrer la simulation", nullptr));
+        pushButton->setText(QCoreApplication::translate("MainWindow", "Restart", nullptr));
     } // retranslateUi
 
 };

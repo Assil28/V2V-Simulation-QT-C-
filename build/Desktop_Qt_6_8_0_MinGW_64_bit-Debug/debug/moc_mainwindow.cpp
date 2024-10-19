@@ -46,15 +46,14 @@ constexpr auto qt_meta_stringdata_CLASSMainWindowENDCLASS = QtMocHelpers::string
     "setLocationMarking",
     "drawPathWithCoordinates",
     "coordinates",
-    "animateCarAlongPath",
+    "addCarPath",
     "getRoute",
     "startLat",
     "startLong",
     "endLat",
     "endLong",
     "generateRandomRoads",
-    "numberOfRoads",
-    "selectAndAnimateRoad"
+    "numberOfRoads"
 );
 #else  // !QT_MOC_HAS_STRINGDATA
 #error "qtmochelpers.h not found or too old."
@@ -67,7 +66,7 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSMainWindowENDCLASS[] = {
       12,       // revision
        0,       // classname
        0,    0, // classinfo
-       7,   14, // methods
+       6,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -75,15 +74,14 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSMainWindowENDCLASS[] = {
        4,       // signalCount
 
  // signals: name, argc, parameters, tag, flags, initial metatype offsets
-       1,    2,   56,    2, 0x06,    1 /* Public */,
-       4,    2,   61,    2, 0x06,    4 /* Public */,
-       5,    1,   66,    2, 0x06,    7 /* Public */,
-       7,    1,   69,    2, 0x06,    9 /* Public */,
+       1,    2,   50,    2, 0x06,    1 /* Public */,
+       4,    2,   55,    2, 0x06,    4 /* Public */,
+       5,    1,   60,    2, 0x06,    7 /* Public */,
+       7,    1,   63,    2, 0x06,    9 /* Public */,
 
  // slots: name, argc, parameters, tag, flags, initial metatype offsets
-       8,    4,   72,    2, 0x0a,   11 /* Public */,
-      13,    1,   81,    2, 0x0a,   16 /* Public */,
-      15,    0,   84,    2, 0x0a,   18 /* Public */,
+       8,    4,   66,    2, 0x0a,   11 /* Public */,
+      13,    1,   75,    2, 0x0a,   16 /* Public */,
 
  // signals: parameters
     QMetaType::Void, 0x80000000 | 3, 0x80000000 | 3,    2,    2,
@@ -94,7 +92,6 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSMainWindowENDCLASS[] = {
  // slots: parameters
     QMetaType::Void, QMetaType::Double, QMetaType::Double, QMetaType::Double, QMetaType::Double,    9,   10,   11,   12,
     QMetaType::Void, QMetaType::Int,   14,
-    QMetaType::Void,
 
        0        // eod
 };
@@ -119,7 +116,7 @@ Q_CONSTINIT const QMetaObject MainWindow::staticMetaObject = { {
         // method 'drawPathWithCoordinates'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         QtPrivate::TypeAndForceComplete<QVariant, std::false_type>,
-        // method 'animateCarAlongPath'
+        // method 'addCarPath'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         QtPrivate::TypeAndForceComplete<QVariant, std::false_type>,
         // method 'getRoute'
@@ -130,9 +127,7 @@ Q_CONSTINIT const QMetaObject MainWindow::staticMetaObject = { {
         QtPrivate::TypeAndForceComplete<double, std::false_type>,
         // method 'generateRandomRoads'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        QtPrivate::TypeAndForceComplete<int, std::false_type>,
-        // method 'selectAndAnimateRoad'
-        QtPrivate::TypeAndForceComplete<void, std::false_type>
+        QtPrivate::TypeAndForceComplete<int, std::false_type>
     >,
     nullptr
 } };
@@ -146,10 +141,9 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 0: _t->setCenterPosition((*reinterpret_cast< std::add_pointer_t<QVariant>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<QVariant>>(_a[2]))); break;
         case 1: _t->setLocationMarking((*reinterpret_cast< std::add_pointer_t<QVariant>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<QVariant>>(_a[2]))); break;
         case 2: _t->drawPathWithCoordinates((*reinterpret_cast< std::add_pointer_t<QVariant>>(_a[1]))); break;
-        case 3: _t->animateCarAlongPath((*reinterpret_cast< std::add_pointer_t<QVariant>>(_a[1]))); break;
+        case 3: _t->addCarPath((*reinterpret_cast< std::add_pointer_t<QVariant>>(_a[1]))); break;
         case 4: _t->getRoute((*reinterpret_cast< std::add_pointer_t<double>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<double>>(_a[2])),(*reinterpret_cast< std::add_pointer_t<double>>(_a[3])),(*reinterpret_cast< std::add_pointer_t<double>>(_a[4]))); break;
         case 5: _t->generateRandomRoads((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
-        case 6: _t->selectAndAnimateRoad(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -177,7 +171,7 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         }
         {
             using _t = void (MainWindow::*)(QVariant );
-            if (_t _q_method = &MainWindow::animateCarAlongPath; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
+            if (_t _q_method = &MainWindow::addCarPath; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
                 *result = 3;
                 return;
             }
@@ -204,13 +198,13 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 7)
+        if (_id < 6)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 7;
+        _id -= 6;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 7)
+        if (_id < 6)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 7;
+        _id -= 6;
     }
     return _id;
 }
@@ -237,7 +231,7 @@ void MainWindow::drawPathWithCoordinates(QVariant _t1)
 }
 
 // SIGNAL 3
-void MainWindow::animateCarAlongPath(QVariant _t1)
+void MainWindow::addCarPath(QVariant _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
     QMetaObject::activate(this, &staticMetaObject, 3, _a);

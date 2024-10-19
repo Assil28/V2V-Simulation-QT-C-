@@ -15,9 +15,9 @@ Rectangle {
     property var polylinePoints: []
     property var polylines: []
 
-    // Car animation properties
-    property var carPath: []
-    property int carPathIndex: 0
+    // Multiple cars and paths
+    property var carPaths: []
+    property var carItems: []
     property real animationDuration: 20000 // 20 seconds to travel the whole path
 
     Plugin {
@@ -38,28 +38,7 @@ Rectangle {
             line.width: 5
             line.color: "red"
             path: window.polylinePoints
-            z: 1 // Mettre un niveau de z plus bas pour les routes
-        }
-
-        // Car item
-        MapQuickItem {
-            id: carItem
-            anchorPoint.x: carImage.width/2
-            anchorPoint.y: carImage.height/2
-            coordinate: QtPositioning.coordinate(0, 0) // Will be updated in animation
-
-
-             z: 2
-
-            sourceItem: Image {
-                id: carImage
-                source: "car.svg"
-                width: 32
-                height: 32
-            }
-
-            // Rotation to make the car face the direction of travel
-            rotation: 0 // Will be updated during animation
+            z: 1
         }
 
         MouseArea {
@@ -67,35 +46,35 @@ Rectangle {
             drag.target: mapview
             acceptedButtons: Qt.LeftButton | Qt.RightButton
 
-            onPressed: {
+            onPressed: function(mouse) {
                 drag.startX = mouse.x;
                 drag.startY = mouse.y;
             }
 
             onReleased: {
-                mapview.panTo(mapview.center);
+                mapview.pan(mapview.center);
             }
 
             onPositionChanged: {
                 if (drag.active) {
                     var deltaLatitude = (mouseY - drag.startY) * 0.0001;
                     var deltaLongitude = (mouseX - drag.startX) * 0.0001;
-                    mapview.center = QtPositioning.coordinate(latitude + deltaLatitude, longitude - deltaLongitude);
+                    mapview.center = QtPositioning.coordinate(mapview.center.latitude + deltaLatitude, mapview.center.longitude - deltaLongitude);
                 }
             }
 
             onDoubleClicked: {
-                zoomLevel += 1;
-                mapview.zoomLevel = zoomLevel;
+                window.zoomLevel += 1;
+                mapview.zoomLevel = window.zoomLevel;
             }
 
             onWheel: function(event) {
                 if (event.angleDelta.y > 0) {
-                    zoomLevel += 1;
+                    window.zoomLevel += 1;
                 } else {
-                    zoomLevel -= 1;
+                    window.zoomLevel -= 1;
                 }
-                mapview.zoomLevel = zoomLevel;
+                mapview.zoomLevel = window.zoomLevel;
             }
         }
     }
@@ -115,8 +94,8 @@ Rectangle {
     }
 
     function drawPathWithCoordinates(coordinates) {
-        var transparentPolyline = Qt.createQmlObject('import QtLocation 5.0; MapPolyline { line.width: 10; line.color: "blue"; path: [] }', mapview);
-        var borderPolyline = Qt.createQmlObject('import QtLocation 5.0; MapPolyline { line.width: 5; line.color: "white"; path: [] }', mapview);
+        var transparentPolyline = Qt.createQmlObject('import QtLocation 5.0; MapPolyline { line.width: 10; line.color: "blue"; path: []; z: 1 }', mapview);
+        var borderPolyline = Qt.createQmlObject('import QtLocation 5.0; MapPolyline { line.width: 5; line.color: "white"; path: []; z: 1 }', mapview);
 
         for (var i = 0; i < coordinates.length; i++) {
             transparentPolyline.path.push(coordinates[i]);
@@ -127,37 +106,57 @@ Rectangle {
         mapview.addMapItem(borderPolyline);
     }
 
-    function animateCarAlongPath(coordinates) {
-        carPath = coordinates;
-        carPathIndex = 0;
-        carItem.coordinate = carPath[0];
-        carAnimation.start();
+    function addCarPath(coordinates) {
+        carPaths.push(coordinates);
+        var carItem = carComponent.createObject(mapview, {
+            coordinate: coordinates[0],
+            z: 2
+        });
+        mapview.addMapItem(carItem);
+        carItems.push(carItem);
+
+        // Start animation for this car
+        animateCarAlongPath(carItems.length - 1);
     }
 
-    Timer {
-        id: carAnimation
-        interval: 100 // Update every 100ms
-        running: false
-        repeat: true
-        onTriggered: {
-            if (carPathIndex < carPath.length - 1) {
-                var start = carPath[carPathIndex];
-                var end = carPath[carPathIndex + 1];
+    function animateCarAlongPath(carIndex) {
+        var timer = Qt.createQmlObject('import QtQuick 2.0; Timer {}', window);
+        timer.interval = 100;
+        timer.repeat = true;
 
-                var progress = (carAnimation.interval / animationDuration) * carPath.length;
+        var pathIndex = 0;
+        timer.triggered.connect(function() {
+            if (pathIndex < carPaths[carIndex].length - 1) {
+                var start = carPaths[carIndex][pathIndex];
+                var end = carPaths[carIndex][pathIndex + 1];
+
+                var progress = (timer.interval / animationDuration) * carPaths[carIndex].length;
                 var interpolatedPosition = QtPositioning.coordinate(
                     start.latitude + (end.latitude - start.latitude) * progress,
                     start.longitude + (end.longitude - start.longitude) * progress
                 );
 
-                carItem.coordinate = interpolatedPosition;
+                carItems[carIndex].coordinate = interpolatedPosition;
 
-               // var angle = Math.atan2(end.longitude - start.longitude, end.latitude - start.latitude) * 180 / Math.PI;
-               // carItem.rotation = angle;
-
-                carPathIndex++;
+                pathIndex++;
             } else {
-                carAnimation.stop();
+                timer.stop();
+            }
+        });
+
+        timer.start();
+    }
+
+    Component {
+        id: carComponent
+        MapQuickItem {
+            anchorPoint.x: carImage.width/2
+            anchorPoint.y: carImage.height/2
+            sourceItem: Image {
+                id: carImage
+                source: "car.svg"
+                width: 32
+                height: 32
             }
         }
     }
@@ -169,6 +168,7 @@ Rectangle {
             anchorPoint.x: image.width / 2
             anchorPoint.y: image.height
             coordinate: QtPositioning.coordinate(0, 0)
+            z: 2
             sourceItem: Image {
                 id: image
                 width: 20
@@ -176,10 +176,5 @@ Rectangle {
                 source: "https://www.pngarts.com/files/3/Map-Marker-Pin-PNG-Image-Background.png"
             }
         }
-    }
-
-    HexagonalGrid {
-        anchors.fill: parent
-        z: 1
     }
 }

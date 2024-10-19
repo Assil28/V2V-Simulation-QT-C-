@@ -8,50 +8,41 @@
 #include <QJsonArray>
 #include <QGeoCoordinate>
 #include <QtPositioning>
-
-#include <cstdlib> // For random generation
-#include <ctime>   // For seeding the random generator
+#include <cstdlib>
+#include <ctime>
+#include <random>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , m_pendingRoads(0)
 {
     ui->setupUi(this);
 
-    // Set up QML view
     ui->quickWidget_MapView->setSource(QUrl(QStringLiteral("qrc:/QmlMaps.qml")));
     ui->quickWidget_MapView->show();
 
-    // Get root object of QML
     QObject *rootObject = ui->quickWidget_MapView->rootObject();
 
-    // Connect signals to QML slots
     connect(this, SIGNAL(setCenterPosition(QVariant, QVariant)),
             rootObject, SLOT(setCenterPosition(QVariant, QVariant)));
     connect(this, SIGNAL(setLocationMarking(QVariant, QVariant)),
             rootObject, SLOT(setLocationMarking(QVariant, QVariant)));
     connect(this, SIGNAL(drawPathWithCoordinates(QVariant)),
             rootObject, SLOT(drawPathWithCoordinates(QVariant)));
+    connect(this, SIGNAL(addCarPath(QVariant)),
+            rootObject, SLOT(addCarPath(QVariant)));
 
-    // Connect the moveCarToPosition signal to the car marker's move function
-
-    connect(this, SIGNAL(animateCarAlongPath(QVariant)),
-            rootObject, SLOT(animateCarAlongPath(QVariant)));
-
-
-    // Set initial map center (Mulhouse)
     emit setCenterPosition(47.729679, 7.321515);
 
-    // Seed the random generator
     std::srand(std::time(0));
 
+    generateRandomRoads(5);
+}
 
-
-    // Generate random roads
-    generateRandomRoads(3);  // Generate 3 random roads
-
-    QTimer::singleShot(1000, this, &MainWindow::selectAndAnimateRoad);
-
+MainWindow::~MainWindow()
+{
+    delete ui;
 }
 
 void MainWindow::generateRandomRoads(int numberOfRoads) {
@@ -65,6 +56,8 @@ void MainWindow::generateRandomRoads(int numberOfRoads) {
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> lat_dist(MIN_LAT, MAX_LAT);
     std::uniform_real_distribution<> long_dist(MIN_LONG, MAX_LONG);
+
+    m_pendingRoads = numberOfRoads;
 
     for (int i = 0; i < numberOfRoads; i++) {
         double startLat, startLong, endLat, endLong;
@@ -84,11 +77,6 @@ void MainWindow::generateRandomRoads(int numberOfRoads) {
 
         getRoute(startLat, startLong, endLat, endLong);
     }
-}
-
-MainWindow::~MainWindow()
-{
-    delete ui;
 }
 
 void MainWindow::getRoute(double startLat, double startLong, double endLat, double endLong)
@@ -120,16 +108,23 @@ void MainWindow::getRoute(double startLat, double startLong, double endLat, doub
                 QJsonObject geometry = route["geometry"].toObject();
                 QJsonArray coordinates = geometry["coordinates"].toArray();
 
-                QList<QGeoCoordinate> geoPathCoordinates;  // Create a QList<QGeoCoordinate>
+                QList<QGeoCoordinate> geoPathCoordinates;
                 for (const QJsonValue &coord : coordinates) {
                     QJsonArray coordPair = coord.toArray();
                     double lon = coordPair[0].toDouble();
                     double lat = coordPair[1].toDouble();
-                    geoPathCoordinates.append(QGeoCoordinate(lat, lon));  // Append QGeoCoordinate directly
+                    geoPathCoordinates.append(QGeoCoordinate(lat, lon));
                 }
 
-                generatedRoads.append(geoPathCoordinates);  // Append the QList<QGeoCoordinate>
-                emit drawPathWithCoordinates(QVariant::fromValue(geoPathCoordinates));  // Convert to QVariantList for signaling
+                generatedRoads.append(geoPathCoordinates);
+                emit drawPathWithCoordinates(QVariant::fromValue(geoPathCoordinates));
+
+                // Add a car for this road immediately
+                QVariantList roadCoordinates;
+                for (const QGeoCoordinate &coord : geoPathCoordinates) {
+                    roadCoordinates.append(QVariant::fromValue(coord));
+                }
+                emit addCarPath(QVariant::fromValue(roadCoordinates));
             } else {
                 qDebug() << "No routes found in response.";
             }
@@ -137,24 +132,14 @@ void MainWindow::getRoute(double startLat, double startLong, double endLat, doub
             qDebug() << "Network error:" << reply->errorString();
         }
 
+        m_pendingRoads--;
+        if (m_pendingRoads == 0) {
+            qDebug() << "All roads generated and cars added.";
+        }
+
         reply->deleteLater();
+        manager->deleteLater();
     });
 }
 
-void MainWindow::selectAndAnimateRoad()
-{
-    if (!generatedRoads.isEmpty()) {
-        // Select a random road
-        int selectedRoadIndex = std::rand() % generatedRoads.size();
-        QList<QGeoCoordinate> selectedRoadCoordinates = generatedRoads[selectedRoadIndex];
-
-        // Convert QList<QGeoCoordinate> to QVariantList
-        QVariantList selectedRoad;
-        for (const QGeoCoordinate &coord : selectedRoadCoordinates) {
-            selectedRoad.append(QVariant::fromValue(coord));
-        }
-
-        // Animate the car along the selected road
-        emit animateCarAlongPath(QVariant::fromValue(selectedRoad));
-    }
-}
+// Remove the addCarsToAllRoads() function as it's no longer needed

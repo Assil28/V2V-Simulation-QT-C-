@@ -1,41 +1,44 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-
 #include <QMainWindow>
 #include <QtQuickWidgets/QQuickWidget>
 #include <QVariant>
 #include <QtCore>
 #include <QtGui>
 #include <QtQuick>
-
+#include <QList>
+#include <QGeoCoordinate>
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
 }
 QT_END_NAMESPACE
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
 private:
     Ui::MainWindow *ui;
+    QList<QList<QGeoCoordinate>> generatedRoads;
+    int m_pendingRoads;
 
-    // Signals to communicate with QML
 signals:
     void setCenterPosition(QVariant, QVariant);
     void setLocationMarking(QVariant, QVariant);
-    void drawPathWithCoordinates(QVariant coordinates);  // Signal to draw paths
+    void drawPathWithCoordinates(QVariant coordinates);
+    void addCarPath(QVariant coordinates);
+    void clearMap();
+    void togglePauseSimulation();  // Added signal
 
 public slots:
-    void getRoute(double startLat, double startLong, double endLat, double endLong);  // Slot to get route
+    void getRoute(double startLat, double startLong, double endLat, double endLong);
+    void generateRandomRoads(int numberOfRoads);
 
-    // Declaration of the new function to generate random roads
-    void generateRandomRoads(int numberOfRoads);  // Slot to generate random roads
+    void onStartSimulationClicked();
+    void onRestartClicked();
+    void onPauseButtonClicked();  // Added slot
+    void onSliderValueChanged(int value);
 };
-
 #endif // MAINWINDOW_H

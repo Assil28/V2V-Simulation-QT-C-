@@ -11,6 +11,8 @@
 #include <cstdlib>
 #include <ctime>
 #include <random>
+#include <QMessageBox>
+//hhhh
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -61,8 +63,18 @@ MainWindow::~MainWindow()
 // Slot pour démarrer la simulation
 void MainWindow::onStartSimulationClicked() {
     qDebug() << "Démarrer la simulation";
-    // Ajouter ici votre logique pour démarrer la simulation
-    generateRandomRoads(5);
+
+    // Get the number of cars from the numCars line edit
+    bool ok;
+    int numberOfCars = ui->numCars->text().toInt(&ok);
+    if (!ok || numberOfCars <= 0) {
+        qDebug() << "Invalid number of cars entered.";
+        QMessageBox::warning(this, "Invalid Input", "Please enter a valid positive integer for the number of cars.");
+        return;
+    }
+
+    // Start the simulation with the specified number of cars
+    generateRandomRoads(numberOfCars);
 }
 void MainWindow::onPauseButtonClicked() {
     emit togglePauseSimulation();

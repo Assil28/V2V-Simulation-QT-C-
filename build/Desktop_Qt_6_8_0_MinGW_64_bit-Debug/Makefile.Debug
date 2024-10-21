@@ -2022,7 +2022,11 @@ debug/mainwindow.o: ../../mainwindow.cpp ../../mainwindow.h \
 		D:/QT/6.8.0/mingw_64/include/QtPositioning/QGeoAreaMonitorSource \
 		D:/QT/6.8.0/mingw_64/include/QtPositioning/qnmeapositioninfosource.h \
 		D:/QT/6.8.0/mingw_64/include/QtPositioning/qnmeasatelliteinfosource.h \
-		D:/QT/6.8.0/mingw_64/include/QtPositioning/qtpositioningversion.h
+		D:/QT/6.8.0/mingw_64/include/QtPositioning/qtpositioningversion.h \
+		D:/QT/6.8.0/mingw_64/include/QtWidgets/QMessageBox \
+		D:/QT/6.8.0/mingw_64/include/QtWidgets/qmessagebox.h \
+		D:/QT/6.8.0/mingw_64/include/QtWidgets/qdialog.h \
+		D:/QT/6.8.0/mingw_64/include/QtWidgets/qdialogbuttonbox.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\mainwindow.o ..\..\mainwindow.cpp
 
 debug/qrc_Maps.o: debug/qrc_Maps.cpp 

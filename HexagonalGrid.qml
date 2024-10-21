@@ -6,7 +6,7 @@ Item {
     height: 600
 
     // Définition du rayon des hexagones
-    property int radius: 50
+    property int radius: 30
 
     // Utilisation d'un Repeater pour générer des hexagones
     Repeater {
@@ -44,7 +44,7 @@ Item {
                     }
                     ctx.closePath(); // Ferme le chemin
                     ctx.strokeStyle = "black"; // Couleur du contour de l'hexagone
-                    ctx.globalAlpha = 0.5; // Définit l'opacité pour un fond de grille semi-transparent
+                    ctx.globalAlpha = 0.25; // Définit l'opacité pour un fond de grille semi-transparent
                     ctx.stroke(); // Dessine le contour de l'hexagone
                 }
             }

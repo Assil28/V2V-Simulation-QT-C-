@@ -13,6 +13,7 @@
 #include <QtQuickWidgets/QQuickWidget>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
@@ -29,6 +30,7 @@ public:
     QQuickWidget *quickWidget_MapView;
     QWidget *horizontalLayoutWidget;
     QHBoxLayout *horizontalLayout;
+    QLineEdit *numCars;
     QPushButton *pushButton_2;
     QPushButton *pauseButton;
     QSlider *horizontalSlider;
@@ -49,10 +51,15 @@ public:
         quickWidget_MapView->setResizeMode(QQuickWidget::ResizeMode::SizeRootObjectToView);
         horizontalLayoutWidget = new QWidget(centralwidget);
         horizontalLayoutWidget->setObjectName("horizontalLayoutWidget");
-        horizontalLayoutWidget->setGeometry(QRect(100, 0, 331, 31));
+        horizontalLayoutWidget->setGeometry(QRect(100, 0, 382, 31));
         horizontalLayout = new QHBoxLayout(horizontalLayoutWidget);
         horizontalLayout->setObjectName("horizontalLayout");
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
+        numCars = new QLineEdit(horizontalLayoutWidget);
+        numCars->setObjectName("numCars");
+
+        horizontalLayout->addWidget(numCars);
+
         pushButton_2 = new QPushButton(horizontalLayoutWidget);
         pushButton_2->setObjectName("pushButton_2");
 

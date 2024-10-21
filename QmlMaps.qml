@@ -135,35 +135,39 @@ Rectangle {
 
 
     function animateCarAlongPath(carIndex) {
-        var timer = Qt.createQmlObject('import QtQuick 2.0; Timer {}', window);
-        timer.interval = 100;
-        timer.repeat = true;
-        carTimers.push(timer);
+            var timer = Qt.createQmlObject('import QtQuick 2.0; Timer {}', window);
 
-        pathIndices[carIndex] = 0;  // Initialize pathIndex for this car
+            // Generate a random speed multiplier between 1.5 and 3.0
+            var speedMultiplier = 1.5 + Math.random() * 1.5;
 
-        timer.triggered.connect(function() {
-            var pathIndex = pathIndices[carIndex];
-            if (pathIndex < carPaths[carIndex].length - 1) {
-                var start = carPaths[carIndex][pathIndex];
-                var end = carPaths[carIndex][pathIndex + 1];
+            timer.interval = 100 / speedMultiplier;
+            timer.repeat = true;
+            carTimers.push(timer);
 
-                var progress = (timer.interval / animationDuration) * carPaths[carIndex].length;
-                var interpolatedPosition = QtPositioning.coordinate(
-                    start.latitude + (end.latitude - start.latitude) * progress,
-                    start.longitude + (end.longitude - start.longitude) * progress
-                );
+            pathIndices[carIndex] = 0;  // Initialize pathIndex for this car
 
-                carItems[carIndex].coordinate = interpolatedPosition;
+            timer.triggered.connect(function() {
+                var pathIndex = pathIndices[carIndex];
+                if (pathIndex < carPaths[carIndex].length - 1) {
+                    var start = carPaths[carIndex][pathIndex];
+                    var end = carPaths[carIndex][pathIndex + 1];
 
-                pathIndices[carIndex] = pathIndex + 1;  // Update pathIndex
-            } else {
-                timer.stop();
-            }
-        });
+                    var progress = (timer.interval / (animationDuration * speedMultiplier)) * carPaths[carIndex].length;
+                    var interpolatedPosition = QtPositioning.coordinate(
+                        start.latitude + (end.latitude - start.latitude) * progress,
+                        start.longitude + (end.longitude - start.longitude) * progress
+                    );
 
-        timer.start();
-    }
+                    carItems[carIndex].coordinate = interpolatedPosition;
+
+                    pathIndices[carIndex] = pathIndex + 1;  // Update pathIndex
+                } else {
+                    timer.stop();
+                }
+            });
+
+            timer.start();
+        }
 
     function togglePauseSimulation() {
         simulationPaused = !simulationPaused

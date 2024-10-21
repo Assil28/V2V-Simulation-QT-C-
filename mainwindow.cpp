@@ -118,10 +118,10 @@ void MainWindow::onSliderValueChanged(int value) {
 
 
 void MainWindow::generateRandomRoads(int numberOfRoads) {
-    constexpr double MIN_LAT = 47.7200;
-    constexpr double MAX_LAT = 47.7700;
-    constexpr double MIN_LONG = 7.3000;
-    constexpr double MAX_LONG = 7.3500;
+    constexpr double MIN_LAT = 47.72196;
+    constexpr double MAX_LAT = 47.74145;
+    constexpr double MIN_LONG = 7.34672;
+    constexpr double MAX_LONG = 7.29112;
     constexpr double MIN_DISTANCE = 0.01;
 
     std::random_device rd;

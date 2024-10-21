@@ -24,6 +24,7 @@ Rectangle {
 
     property var carCircles: []
      property var carRadii: []
+    property var carActive: []  // Nouvelle propriété pour suivre l'état actif des voitures
       property real baseCircleRadius: 50
 
     property real animationDuration: 20000 // 20 seconds to travel the whole path
@@ -49,42 +50,42 @@ Rectangle {
             z: 1
         }
 
-        MouseArea {
-            anchors.fill: parent
-            drag.target: mapview
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
+        // MouseArea {
+        //     anchors.fill: parent
+        //     drag.target: mapview
+        //     acceptedButtons: Qt.LeftButton | Qt.RightButton
 
-            onPressed: function(mouse) {
-                drag.startX = mouse.x;
-                drag.startY = mouse.y;
-            }
+        //     onPressed: function(mouse) {
+        //         drag.startX = mouse.x;
+        //         drag.startY = mouse.y;
+        //     }
 
-            onReleased: {
-                mapview.pan(mapview.center);
-            }
+        //     onReleased: {
+        //         mapview.pan(mapview.center);
+        //     }
 
-            onPositionChanged: {
-                if (drag.active) {
-                    var deltaLatitude = (mouseY - drag.startY) * 0.0001;
-                    var deltaLongitude = (mouseX - drag.startX) * 0.0001;
-                    mapview.center = QtPositioning.coordinate(mapview.center.latitude + deltaLatitude, mapview.center.longitude - deltaLongitude);
-                }
-            }
+        //     onPositionChanged: {
+        //         if (drag.active) {
+        //             var deltaLatitude = (mouseY - drag.startY) * 0.0001;
+        //             var deltaLongitude = (mouseX - drag.startX) * 0.0001;
+        //             mapview.center = QtPositioning.coordinate(mapview.center.latitude + deltaLatitude, mapview.center.longitude - deltaLongitude);
+        //         }
+        //     }
 
-            onDoubleClicked: {
-                window.zoomLevel += 1;
-                mapview.zoomLevel = window.zoomLevel;
-            }
+        //     onDoubleClicked: {
+        //         window.zoomLevel += 1;
+        //         mapview.zoomLevel = window.zoomLevel;
+        //     }
 
-            onWheel: function(event) {
-                if (event.angleDelta.y > 0) {
-                    window.zoomLevel += 1;
-                } else {
-                    window.zoomLevel -= 1;
-                }
-                mapview.zoomLevel = window.zoomLevel;
-            }
-        }
+        //     onWheel: function(event) {
+        //         if (event.angleDelta.y > 0) {
+        //             window.zoomLevel += 1;
+        //         } else {
+        //             window.zoomLevel -= 1;
+        //         }
+        //         mapview.zoomLevel = window.zoomLevel;
+        //     }
+        // }
 
 
 
@@ -154,6 +155,7 @@ Rectangle {
         mapview.addMapItem(circleItem);
         carCircles.push(circleItem);
         carRadii.push(circleRadius);
+        carActive.push(true);  // La voiture est initialement active
         mapItems.push(circleItem);
 
         // Démarrer l'animation pour cette voiture
@@ -184,43 +186,38 @@ Rectangle {
                 carItems[carIndex].coordinate = interpolatedPosition;
                 carCircles[carIndex].center = interpolatedPosition;
 
-                checkCollisions(carIndex);
+                checkCollisions();
 
                 pathIndices[carIndex] = pathIndex + 1;  // Mettre à jour pathIndex
             } else {
                 timer.stop();
+                carActive[carIndex] = false;  // Marquer la voiture comme inactive
+                checkCollisions();  // Vérifier les collisions une dernière fois
             }
         });
 
         timer.start();
     }
 
-    function checkCollisions(currentCarIndex) {
-        var currentCar = carCircles[currentCarIndex];
-        var currentRadius = carRadii[currentCarIndex];
-        var hasCollision = false;
-
+    function checkCollisions() {
+        // Réinitialiser toutes les couleurs
         for (var i = 0; i < carCircles.length; i++) {
-            if (i !== currentCarIndex) {
-                var otherCar = carCircles[i];
-                var otherRadius = carRadii[i];
-                var distance = currentCar.center.distanceTo(otherCar.center);
-
-                if (distance < (currentRadius + otherRadius)) {
-                    // Collision détectée
-                    currentCar.color = Qt.rgba(0, 1, 0, 0.2);  // Vert semi-transparent
-                    currentCar.border.color = "green";
-                    otherCar.color = Qt.rgba(0, 1, 0, 0.2);  // Vert semi-transparent
-                    otherCar.border.color = "green";
-                    hasCollision = true;
-                }
-            }
+            carCircles[i].color = Qt.rgba(1, 0, 0, 0.2);  // Rouge semi-transparent
+            carCircles[i].border.color = "red";
         }
 
-        if (!hasCollision) {
-            // Pas de collision, remettre la couleur d'origine
-            currentCar.color = Qt.rgba(1, 0, 0, 0.2);  // Rouge semi-transparent
-            currentCar.border.color = "red";
+        // Vérifier les collisions
+        for (var i = 0; i < carCircles.length; i++) {
+            for (var j = i + 1; j < carCircles.length; j++) {
+                var distance = carCircles[i].center.distanceTo(carCircles[j].center);
+                if (distance < (carRadii[i] + carRadii[j])) {
+                    // Collision détectée
+                    carCircles[i].color = Qt.rgba(0, 1, 0, 0.2);  // Vert semi-transparent
+                    carCircles[i].border.color = "green";
+                    carCircles[j].color = Qt.rgba(0, 1, 0, 0.2);  // Vert semi-transparent
+                    carCircles[j].border.color = "green";
+                }
+            }
         }
     }
 
@@ -263,6 +260,8 @@ Rectangle {
                 }
                 carCircles = [];
                 carRadii = [];
+        carActive = [];
+
 
         // Clear other data
         carItems = []

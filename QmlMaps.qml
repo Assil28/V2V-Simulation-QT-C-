@@ -136,7 +136,11 @@ Rectangle {
 
     function animateCarAlongPath(carIndex) {
         var timer = Qt.createQmlObject('import QtQuick 2.0; Timer {}', window);
-        timer.interval = 100;
+
+        // Generate a random speed multiplier between 1.5 and 3.0
+        var speedMultiplier = 1.5 + Math.random() * 1.5;
+
+        timer.interval = 100 / speedMultiplier;
         timer.repeat = true;
         carTimers.push(timer);
 
@@ -148,7 +152,7 @@ Rectangle {
                 var start = carPaths[carIndex][pathIndex];
                 var end = carPaths[carIndex][pathIndex + 1];
 
-                var progress = (timer.interval / animationDuration) * carPaths[carIndex].length;
+                var progress = (timer.interval / (animationDuration * speedMultiplier)) * carPaths[carIndex].length;
                 var interpolatedPosition = QtPositioning.coordinate(
                     start.latitude + (end.latitude - start.latitude) * progress,
                     start.longitude + (end.longitude - start.longitude) * progress
@@ -164,6 +168,7 @@ Rectangle {
 
         timer.start();
     }
+
 
     function togglePauseSimulation() {
         simulationPaused = !simulationPaused

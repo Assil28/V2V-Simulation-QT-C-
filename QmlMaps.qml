@@ -23,6 +23,7 @@ Rectangle {
     property var carTimers: []
 
     property var carCircles: []
+     property var carRadii: []
       property real baseCircleRadius: 50
 
     property real animationDuration: 20000 // 20 seconds to travel the whole path
@@ -122,6 +123,8 @@ Rectangle {
     }
 
 
+
+
     function addCarPath(coordinates) {
         carPaths.push(coordinates);
 
@@ -150,6 +153,7 @@ Rectangle {
         circleItem.border.color = "red";
         mapview.addMapItem(circleItem);
         carCircles.push(circleItem);
+        carRadii.push(circleRadius);
         mapItems.push(circleItem);
 
         // Démarrer l'animation pour cette voiture
@@ -180,6 +184,8 @@ Rectangle {
                 carItems[carIndex].coordinate = interpolatedPosition;
                 carCircles[carIndex].center = interpolatedPosition;
 
+                checkCollisions(carIndex);
+
                 pathIndices[carIndex] = pathIndex + 1;  // Mettre à jour pathIndex
             } else {
                 timer.stop();
@@ -187,6 +193,35 @@ Rectangle {
         });
 
         timer.start();
+    }
+
+    function checkCollisions(currentCarIndex) {
+        var currentCar = carCircles[currentCarIndex];
+        var currentRadius = carRadii[currentCarIndex];
+        var hasCollision = false;
+
+        for (var i = 0; i < carCircles.length; i++) {
+            if (i !== currentCarIndex) {
+                var otherCar = carCircles[i];
+                var otherRadius = carRadii[i];
+                var distance = currentCar.center.distanceTo(otherCar.center);
+
+                if (distance < (currentRadius + otherRadius)) {
+                    // Collision détectée
+                    currentCar.color = Qt.rgba(0, 1, 0, 0.2);  // Vert semi-transparent
+                    currentCar.border.color = "green";
+                    otherCar.color = Qt.rgba(0, 1, 0, 0.2);  // Vert semi-transparent
+                    otherCar.border.color = "green";
+                    hasCollision = true;
+                }
+            }
+        }
+
+        if (!hasCollision) {
+            // Pas de collision, remettre la couleur d'origine
+            currentCar.color = Qt.rgba(1, 0, 0, 0.2);  // Rouge semi-transparent
+            currentCar.border.color = "red";
+        }
     }
 
     function togglePauseSimulation() {
@@ -222,11 +257,12 @@ Rectangle {
         mapItems = []
 
         // Supprimer et détruire les cercles des voitures
-               for (var i = 0; i < carCircles.length; i++) {
-                   mapview.removeMapItem(carCircles[i]);
-                   carCircles[i].destroy();
-               }
-               carCircles = [];
+        for (var i = 0; i < carCircles.length; i++) {
+                    mapview.removeMapItem(carCircles[i]);
+                    carCircles[i].destroy();
+                }
+                carCircles = [];
+                carRadii = [];
 
         // Clear other data
         carItems = []

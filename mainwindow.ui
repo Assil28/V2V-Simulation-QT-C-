@@ -32,11 +32,14 @@
      <rect>
       <x>100</x>
       <y>0</y>
-      <width>331</width>
+      <width>382</width>
       <height>31</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLineEdit" name="numCars"/>
+     </item>
      <item>
       <widget class="QPushButton" name="pushButton_2">
        <property name="text">

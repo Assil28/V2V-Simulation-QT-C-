@@ -2,7 +2,7 @@ QT       += core gui
 QT += quickwidgets quick
 QT += core gui positioning network
 QT += network
-
+QT += widgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 

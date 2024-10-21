@@ -22,6 +22,9 @@ Rectangle {
     property var carPaths: []
     property var carTimers: []
 
+    property var carCircles: []
+      property real baseCircleRadius: 50
+
     property real animationDuration: 20000 // 20 seconds to travel the whole path
 
     Plugin {
@@ -121,6 +124,14 @@ Rectangle {
 
     function addCarPath(coordinates) {
         carPaths.push(coordinates);
+
+        // Générer une vitesse aléatoire entre 1.5 et 3.0
+        var speedMultiplier = 1.5 + Math.random() * 1.5;
+
+        // Générer une fréquence aléatoire entre 0.5 et 2.0
+        var frequency = 0.5 + Math.random() * 1.5;
+
+        // Créer la voiture
         var carItem = carComponent.createObject(mapview, {
             coordinate: coordinates[0],
             z: 2
@@ -129,45 +140,54 @@ Rectangle {
         carItems.push(carItem);
         mapItems.push(carItem);
 
-        // Start animation for this car
-        animateCarAlongPath(carItems.length - 1);
+        // Créer le cercle autour de la voiture
+        var circleRadius = baseCircleRadius * speedMultiplier * frequency;
+        var circleItem = Qt.createQmlObject('import QtLocation 5.0; MapCircle {}', mapview);
+        circleItem.center = coordinates[0];
+        circleItem.radius = circleRadius;
+        circleItem.color = Qt.rgba(1, 0, 0, 0.2);  // Rouge semi-transparent
+        circleItem.border.width = 2;
+        circleItem.border.color = "red";
+        mapview.addMapItem(circleItem);
+        carCircles.push(circleItem);
+        mapItems.push(circleItem);
+
+        // Démarrer l'animation pour cette voiture
+        animateCarAlongPath(carItems.length - 1, speedMultiplier, frequency);
     }
 
+    function animateCarAlongPath(carIndex, speedMultiplier, frequency) {
+        var timer = Qt.createQmlObject('import QtQuick 2.0; Timer {}', window);
 
-    function animateCarAlongPath(carIndex) {
-            var timer = Qt.createQmlObject('import QtQuick 2.0; Timer {}', window);
+        timer.interval = 100 / speedMultiplier;
+        timer.repeat = true;
+        carTimers.push(timer);
 
-            // Generate a random speed multiplier between 1.5 and 3.0
-            var speedMultiplier = 1.5 + Math.random() * 1.5;
+        pathIndices[carIndex] = 0;  // Initialiser pathIndex pour cette voiture
 
-            timer.interval = 100 / speedMultiplier;
-            timer.repeat = true;
-            carTimers.push(timer);
+        timer.triggered.connect(function() {
+            var pathIndex = pathIndices[carIndex];
+            if (pathIndex < carPaths[carIndex].length - 1) {
+                var start = carPaths[carIndex][pathIndex];
+                var end = carPaths[carIndex][pathIndex + 1];
 
-            pathIndices[carIndex] = 0;  // Initialize pathIndex for this car
+                var progress = (timer.interval / (animationDuration * speedMultiplier)) * carPaths[carIndex].length;
+                var interpolatedPosition = QtPositioning.coordinate(
+                    start.latitude + (end.latitude - start.latitude) * progress,
+                    start.longitude + (end.longitude - start.longitude) * progress
+                );
 
-            timer.triggered.connect(function() {
-                var pathIndex = pathIndices[carIndex];
-                if (pathIndex < carPaths[carIndex].length - 1) {
-                    var start = carPaths[carIndex][pathIndex];
-                    var end = carPaths[carIndex][pathIndex + 1];
+                carItems[carIndex].coordinate = interpolatedPosition;
+                carCircles[carIndex].center = interpolatedPosition;
 
-                    var progress = (timer.interval / (animationDuration * speedMultiplier)) * carPaths[carIndex].length;
-                    var interpolatedPosition = QtPositioning.coordinate(
-                        start.latitude + (end.latitude - start.latitude) * progress,
-                        start.longitude + (end.longitude - start.longitude) * progress
-                    );
+                pathIndices[carIndex] = pathIndex + 1;  // Mettre à jour pathIndex
+            } else {
+                timer.stop();
+            }
+        });
 
-                    carItems[carIndex].coordinate = interpolatedPosition;
-
-                    pathIndices[carIndex] = pathIndex + 1;  // Update pathIndex
-                } else {
-                    timer.stop();
-                }
-            });
-
-            timer.start();
-        }
+        timer.start();
+    }
 
     function togglePauseSimulation() {
         simulationPaused = !simulationPaused
@@ -200,6 +220,13 @@ Rectangle {
             mapItems[i].destroy()
         }
         mapItems = []
+
+        // Supprimer et détruire les cercles des voitures
+               for (var i = 0; i < carCircles.length; i++) {
+                   mapview.removeMapItem(carCircles[i]);
+                   carCircles[i].destroy();
+               }
+               carCircles = [];
 
         // Clear other data
         carItems = []

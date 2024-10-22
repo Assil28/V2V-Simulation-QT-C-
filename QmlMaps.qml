@@ -266,6 +266,11 @@ Rectangle {
         // Clear other data
         carItems = []
         carPaths = []
+
+        // Réinitialiser la grille d'hexagones
+               if (hexGrid) {
+                   hexGrid.resetGrid()
+               }
     }
 
     Component {
@@ -300,7 +305,8 @@ Rectangle {
     }
 
     HexagonalGrid {
-       anchors.fill: parent
-       z: 1  // Ensure it is above the map
-   }
+            id: hexGrid
+            anchors.fill: parent
+            z: 1
+        }
 }

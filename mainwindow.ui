@@ -30,15 +30,22 @@
    <widget class="QWidget" name="horizontalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>100</x>
+      <x>90</x>
       <y>0</y>
-      <width>382</width>
+      <width>561</width>
       <height>31</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QLineEdit" name="numCars"/>
+      <widget class="QLineEdit" name="numCars">
+       <property name="maximumSize">
+        <size>
+         <width>35</width>
+         <height>23</height>
+        </size>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="pushButton_2">
@@ -56,6 +63,15 @@
      </item>
      <item>
       <widget class="QSlider" name="horizontalSlider">
+       <property name="minimum">
+        <number>0</number>
+       </property>
+       <property name="maximum">
+        <number>100</number>
+       </property>
+       <property name="value">
+        <number>50</number>
+       </property>
        <property name="orientation">
         <enum>Qt::Orientation::Horizontal</enum>
        </property>
@@ -68,6 +84,13 @@
        </property>
       </widget>
      </item>
+     <item>
+        <widget class="QPushButton" name="toggleGridButton">
+        <property name="text">
+        <string>Afficher/Cacher Grille</string>
+        </property>
+        </widget>
+    </item>
     </layout>
    </widget>
   </widget>
@@ -77,7 +100,7 @@
      <x>0</x>
      <y>0</y>
      <width>1451</width>
-     <height>19</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>

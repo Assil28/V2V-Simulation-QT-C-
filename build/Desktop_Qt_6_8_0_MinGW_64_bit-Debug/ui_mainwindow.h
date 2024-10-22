@@ -35,6 +35,7 @@ public:
     QPushButton *pauseButton;
     QSlider *horizontalSlider;
     QPushButton *pushButton;
+    QPushButton *toggleGridButton;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -51,12 +52,13 @@ public:
         quickWidget_MapView->setResizeMode(QQuickWidget::ResizeMode::SizeRootObjectToView);
         horizontalLayoutWidget = new QWidget(centralwidget);
         horizontalLayoutWidget->setObjectName("horizontalLayoutWidget");
-        horizontalLayoutWidget->setGeometry(QRect(100, 0, 382, 31));
+        horizontalLayoutWidget->setGeometry(QRect(90, 0, 561, 31));
         horizontalLayout = new QHBoxLayout(horizontalLayoutWidget);
         horizontalLayout->setObjectName("horizontalLayout");
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
         numCars = new QLineEdit(horizontalLayoutWidget);
         numCars->setObjectName("numCars");
+        numCars->setMaximumSize(QSize(35, 23));
 
         horizontalLayout->addWidget(numCars);
 
@@ -72,6 +74,9 @@ public:
 
         horizontalSlider = new QSlider(horizontalLayoutWidget);
         horizontalSlider->setObjectName("horizontalSlider");
+        horizontalSlider->setMinimum(0);
+        horizontalSlider->setMaximum(100);
+        horizontalSlider->setValue(50);
         horizontalSlider->setOrientation(Qt::Orientation::Horizontal);
 
         horizontalLayout->addWidget(horizontalSlider);
@@ -81,10 +86,15 @@ public:
 
         horizontalLayout->addWidget(pushButton);
 
+        toggleGridButton = new QPushButton(horizontalLayoutWidget);
+        toggleGridButton->setObjectName("toggleGridButton");
+
+        horizontalLayout->addWidget(toggleGridButton);
+
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName("menubar");
-        menubar->setGeometry(QRect(0, 0, 1451, 19));
+        menubar->setGeometry(QRect(0, 0, 1451, 25));
         MainWindow->setMenuBar(menubar);
         statusbar = new QStatusBar(MainWindow);
         statusbar->setObjectName("statusbar");
@@ -101,6 +111,7 @@ public:
         pushButton_2->setText(QCoreApplication::translate("MainWindow", "Demarrer la simulation", nullptr));
         pauseButton->setText(QCoreApplication::translate("MainWindow", "Pause", nullptr));
         pushButton->setText(QCoreApplication::translate("MainWindow", "nettoyer la map", nullptr));
+        toggleGridButton->setText(QCoreApplication::translate("MainWindow", "Afficher/Cacher Grille", nullptr));
     } // retranslateUi
 
 };

@@ -29,6 +29,9 @@ Rectangle {
 
     property real animationDuration: 20000 // 20 seconds to travel the whole path
 
+// for show and hide grid
+ property bool hexGridVisible: true
+
     Plugin {
         id: mapPlugin
         name: "osm"
@@ -273,6 +276,11 @@ Rectangle {
                }
     }
 
+    //for hide and show grid
+      function toggleHexGrid() {
+        hexGridVisible = !hexGridVisible;
+    }
+
     Component {
         id: carComponent
         MapQuickItem {
@@ -308,5 +316,6 @@ Rectangle {
             id: hexGrid
             anchors.fill: parent
             z: 1
+            visible : hexGridVisible
         }
 }

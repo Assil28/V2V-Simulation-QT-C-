@@ -49,6 +49,7 @@ constexpr auto qt_meta_stringdata_CLASSMainWindowENDCLASS = QtMocHelpers::string
     "addCarPath",
     "clearMap",
     "togglePauseSimulation",
+    "toggleHexGrid",
     "getRoute",
     "startLat",
     "startLong",
@@ -60,7 +61,8 @@ constexpr auto qt_meta_stringdata_CLASSMainWindowENDCLASS = QtMocHelpers::string
     "onRestartClicked",
     "onPauseButtonClicked",
     "onSliderValueChanged",
-    "value"
+    "value",
+    "onToggleGridButtonClicked"
 );
 #else  // !QT_MOC_HAS_STRINGDATA
 #error "qtmochelpers.h not found or too old."
@@ -73,28 +75,30 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSMainWindowENDCLASS[] = {
       12,       // revision
        0,       // classname
        0,    0, // classinfo
-      12,   14, // methods
+      14,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       6,       // signalCount
+       7,       // signalCount
 
  // signals: name, argc, parameters, tag, flags, initial metatype offsets
-       1,    2,   86,    2, 0x06,    1 /* Public */,
-       4,    2,   91,    2, 0x06,    4 /* Public */,
-       5,    1,   96,    2, 0x06,    7 /* Public */,
-       7,    1,   99,    2, 0x06,    9 /* Public */,
-       8,    0,  102,    2, 0x06,   11 /* Public */,
-       9,    0,  103,    2, 0x06,   12 /* Public */,
+       1,    2,   98,    2, 0x06,    1 /* Public */,
+       4,    2,  103,    2, 0x06,    4 /* Public */,
+       5,    1,  108,    2, 0x06,    7 /* Public */,
+       7,    1,  111,    2, 0x06,    9 /* Public */,
+       8,    0,  114,    2, 0x06,   11 /* Public */,
+       9,    0,  115,    2, 0x06,   12 /* Public */,
+      10,    0,  116,    2, 0x06,   13 /* Public */,
 
  // slots: name, argc, parameters, tag, flags, initial metatype offsets
-      10,    4,  104,    2, 0x0a,   13 /* Public */,
-      15,    1,  113,    2, 0x0a,   18 /* Public */,
-      17,    0,  116,    2, 0x0a,   20 /* Public */,
-      18,    0,  117,    2, 0x0a,   21 /* Public */,
-      19,    0,  118,    2, 0x0a,   22 /* Public */,
-      20,    1,  119,    2, 0x0a,   23 /* Public */,
+      11,    4,  117,    2, 0x0a,   14 /* Public */,
+      16,    1,  126,    2, 0x0a,   19 /* Public */,
+      18,    0,  129,    2, 0x0a,   21 /* Public */,
+      19,    0,  130,    2, 0x0a,   22 /* Public */,
+      20,    0,  131,    2, 0x0a,   23 /* Public */,
+      21,    1,  132,    2, 0x0a,   24 /* Public */,
+      23,    0,  135,    2, 0x08,   26 /* Private */,
 
  // signals: parameters
     QMetaType::Void, 0x80000000 | 3, 0x80000000 | 3,    2,    2,
@@ -103,14 +107,16 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSMainWindowENDCLASS[] = {
     QMetaType::Void, 0x80000000 | 3,    6,
     QMetaType::Void,
     QMetaType::Void,
+    QMetaType::Void,
 
  // slots: parameters
-    QMetaType::Void, QMetaType::Double, QMetaType::Double, QMetaType::Double, QMetaType::Double,   11,   12,   13,   14,
-    QMetaType::Void, QMetaType::Int,   16,
+    QMetaType::Void, QMetaType::Double, QMetaType::Double, QMetaType::Double, QMetaType::Double,   12,   13,   14,   15,
+    QMetaType::Void, QMetaType::Int,   17,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::Int,   21,
+    QMetaType::Void, QMetaType::Int,   22,
+    QMetaType::Void,
 
        0        // eod
 };
@@ -142,6 +148,8 @@ Q_CONSTINIT const QMetaObject MainWindow::staticMetaObject = { {
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'togglePauseSimulation'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        // method 'toggleHexGrid'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'getRoute'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         QtPrivate::TypeAndForceComplete<double, std::false_type>,
@@ -159,7 +167,9 @@ Q_CONSTINIT const QMetaObject MainWindow::staticMetaObject = { {
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'onSliderValueChanged'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        QtPrivate::TypeAndForceComplete<int, std::false_type>
+        QtPrivate::TypeAndForceComplete<int, std::false_type>,
+        // method 'onToggleGridButtonClicked'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>
     >,
     nullptr
 } };
@@ -176,12 +186,14 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 3: _t->addCarPath((*reinterpret_cast< std::add_pointer_t<QVariant>>(_a[1]))); break;
         case 4: _t->clearMap(); break;
         case 5: _t->togglePauseSimulation(); break;
-        case 6: _t->getRoute((*reinterpret_cast< std::add_pointer_t<double>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<double>>(_a[2])),(*reinterpret_cast< std::add_pointer_t<double>>(_a[3])),(*reinterpret_cast< std::add_pointer_t<double>>(_a[4]))); break;
-        case 7: _t->generateRandomRoads((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
-        case 8: _t->onStartSimulationClicked(); break;
-        case 9: _t->onRestartClicked(); break;
-        case 10: _t->onPauseButtonClicked(); break;
-        case 11: _t->onSliderValueChanged((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
+        case 6: _t->toggleHexGrid(); break;
+        case 7: _t->getRoute((*reinterpret_cast< std::add_pointer_t<double>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<double>>(_a[2])),(*reinterpret_cast< std::add_pointer_t<double>>(_a[3])),(*reinterpret_cast< std::add_pointer_t<double>>(_a[4]))); break;
+        case 8: _t->generateRandomRoads((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
+        case 9: _t->onStartSimulationClicked(); break;
+        case 10: _t->onRestartClicked(); break;
+        case 11: _t->onPauseButtonClicked(); break;
+        case 12: _t->onSliderValueChanged((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
+        case 13: _t->onToggleGridButtonClicked(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -228,6 +240,13 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
                 return;
             }
         }
+        {
+            using _t = void (MainWindow::*)();
+            if (_t _q_method = &MainWindow::toggleHexGrid; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
+                *result = 6;
+                return;
+            }
+        }
     }
 }
 
@@ -250,13 +269,13 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 12)
+        if (_id < 14)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 12;
+        _id -= 14;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 12)
+        if (_id < 14)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 12;
+        _id -= 14;
     }
     return _id;
 }
@@ -299,5 +318,11 @@ void MainWindow::clearMap()
 void MainWindow::togglePauseSimulation()
 {
     QMetaObject::activate(this, &staticMetaObject, 5, nullptr);
+}
+
+// SIGNAL 6
+void MainWindow::toggleHexGrid()
+{
+    QMetaObject::activate(this, &staticMetaObject, 6, nullptr);
 }
 QT_WARNING_POP

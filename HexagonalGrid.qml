@@ -103,7 +103,7 @@ Item {
                     if (hexagonCarCounts[index] && hexagonCarCounts[index].size > 0) {
                         // Intensité basée sur le nombre de voitures
                         let intensity = Math.min(hexagonCarCounts[index].size * 0.3, 1.0);
-                        ctx.fillStyle = Qt.rgba(1.0, 0, 0, intensity);
+                        ctx.fillStyle = Qt.rgba(1.0, 0, 1.0, intensity);
                         ctx.fill();
 
                         // Afficher le nombre de voitures

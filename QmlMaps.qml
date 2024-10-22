@@ -18,7 +18,7 @@ Rectangle {
         // Add missing property declarations
         property var carSpeeds: []
         property var carFrequencies: []
-        property var carActive: []
+
 
         property bool simulationPaused: false
         property var pathIndices: []
@@ -29,11 +29,14 @@ Rectangle {
 
         property var carCircles: []
         property var carRadii: []
+        property var carActive: []
         property real baseCircleRadius: 50
 
         property real animationDuration: 20000
         signal collisionDetected(int carIndex1, int carIndex2, real speed1, real frequency1, real speed2, real frequency2)
         property var collisionPairs: []
+    // for show and hide grid
+     property bool hexGridVisible: true
 
     Plugin {
         id: mapPlugin
@@ -171,6 +174,7 @@ Rectangle {
         mapview.addMapItem(circleItem);
         carCircles.push(circleItem);
         carRadii.push(circleRadius);
+        carActive.push(true);
         mapItems.push(circleItem);
 
         // Start animation
@@ -218,45 +222,43 @@ Rectangle {
     }
 
 
-    function checkCollisions(currentCarIndex) {
-        var currentCar = carCircles[currentCarIndex];
-        var currentRadius = carRadii[currentCarIndex];
-
+    function checkCollisions() {
+        // Reset all car colors to the default (red) at the start
         for (var i = 0; i < carCircles.length; i++) {
-            if (i !== currentCarIndex) {
-                var otherCar = carCircles[i];
-                var otherRadius = carRadii[i];
-                var distance = currentCar.center.distanceTo(otherCar.center);
+            carCircles[i].color = Qt.rgba(1, 0, 0, 0.2);  // Red semi-transparent
+            carCircles[i].border.color = "red";
+        }
 
-                if (distance < (currentRadius + otherRadius)) {
+        // Check for collisions between all cars
+        for (var i = 0; i < carCircles.length; i++) {
+            for (var j = i + 1; j < carCircles.length; j++) {
+                var distance = carCircles[i].center.distanceTo(carCircles[j].center);
+
+                if (distance < (carRadii[i] + carRadii[j])) {
                     // Collision detected
-                    currentCar.color = Qt.rgba(0, 1, 0, 0.2);
-                    currentCar.border.color = "green";
-                    otherCar.color = Qt.rgba(0, 1, 0, 0.2);
-                    otherCar.border.color = "green";
+                    carCircles[i].color = Qt.rgba(0, 1, 0, 0.2);  // Green semi-transparent
+                    carCircles[i].border.color = "green";
+                    carCircles[j].color = Qt.rgba(0, 1, 0, 0.2);  // Green semi-transparent
+                    carCircles[j].border.color = "green";
 
-                    // Emit signal if collision not already reported
-                    var pairKey = currentCarIndex < i ? currentCarIndex + "-" + i : i + "-" + currentCarIndex;
+                    // Create a unique key for this collision pair
+                    var pairKey = i < j ? i + "-" + j : j + "-" + i;
+
+                    // Emit the collisionDetected signal if this collision hasn't been reported yet
                     if (collisionPairs.indexOf(pairKey) === -1) {
                         collisionPairs.push(pairKey);
                         collisionDetected(
-                            currentCarIndex,
                             i,
-                            carSpeeds[currentCarIndex],
-                            carFrequencies[currentCarIndex],
+                            j,
                             carSpeeds[i],
-                            carFrequencies[i]
+                            carFrequencies[i],
+                            carSpeeds[j],
+                            carFrequencies[j]
                         );
                     }
                 } else {
-                    // No collision, reset colors
-                    currentCar.color = Qt.rgba(1, 0, 0, 0.2);
-                    currentCar.border.color = "red";
-                    otherCar.color = Qt.rgba(1, 0, 0, 0.2);
-                    otherCar.border.color = "red";
-
-                    // Remove collision from collisionPairs if present
-                    var pairKey = currentCarIndex < i ? currentCarIndex + "-" + i : i + "-" + currentCarIndex;
+                    // If no collision for this pair, remove it from the collisionPairs if previously detected
+                    var pairKey = i < j ? i + "-" + j : j + "-" + i;
                     var index = collisionPairs.indexOf(pairKey);
                     if (index !== -1) {
                         collisionPairs.splice(index, 1);
@@ -306,7 +308,7 @@ Rectangle {
                 }
                 carCircles = [];
                 carRadii = [];
-
+        carActive = [];
         // Clear other data
         carItems = []
         carPaths = []
@@ -314,6 +316,10 @@ Rectangle {
         if (hexGrid) {
           hexGrid.resetGrid()
       }
+    }
+    //for hide and show grid
+    function toggleHexGrid() {
+        hexGridVisible = !hexGridVisible;
     }
     onCollisionDetected: mainWindow.logCollision(carIndex1, carIndex2, speed1, frequency1, speed2, frequency2)
     Component {
@@ -351,5 +357,6 @@ Rectangle {
        id: hexGrid
        anchors.fill: parent
        z: 1
+       visible : hexGridVisible
    }
 }

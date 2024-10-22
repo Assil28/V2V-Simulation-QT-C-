@@ -32,13 +32,20 @@
      <rect>
       <x>100</x>
       <y>0</y>
-      <width>451</width>
+      <width>951</width>
       <height>31</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QLineEdit" name="numCars"/>
+      <widget class="QLineEdit" name="numCars">
+       <property name="maximumSize">
+        <size>
+         <width>50</width>
+         <height>16777215</height>
+        </size>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="pushButton_2">
@@ -68,6 +75,13 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="toggleGridButton">
+       <property name="text">
+        <string>Afficher/Cacher Grille</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </widget>
    <widget class="QWidget" name="verticalLayoutWidget">
@@ -76,7 +90,7 @@
       <x>1080</x>
       <y>0</y>
       <width>371</width>
-      <height>631</height>
+      <height>731</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -88,14 +102,14 @@
           <x>0</x>
           <y>-50</y>
           <width>371</width>
-          <height>681</height>
+          <height>781</height>
          </rect>
         </property>
         <property name="styleSheet">
-            <string>
+         <string>
                 background-color: rgba(0, 0, 0, 180);
                 color: white;
-            </string>   
+            </string>
         </property>
         <widget class="QListWidget" name="logListWidget">
          <property name="geometry">
@@ -103,15 +117,15 @@
            <x>0</x>
            <y>50</y>
            <width>371</width>
-           <height>631</height>
+           <height>721</height>
           </rect>
          </property>
          <property name="styleSheet">
-            <string>
+          <string>
                 background-color: rgba(0, 0, 0, 180);  /* Black with transparency */
                 color: white;  /* White text */
             </string>
-        </property>
+         </property>
         </widget>
        </widget>
       </widget>

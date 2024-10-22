@@ -39,6 +39,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, SIGNAL(togglePauseSimulation()),
             rootObject, SLOT(togglePauseSimulation()));
 
+    //for the grid shhow hide
+    connect(this, SIGNAL(toggleHexGrid()),
+            rootObject, SLOT(toggleHexGrid()));
+
     // Connect buttons and slider
     connect(ui->pushButton_2, &QPushButton::clicked, this, &MainWindow::onStartSimulationClicked);
     connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::onRestartClicked);
@@ -47,6 +51,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->quickWidget_MapView->rootContext()->setContextProperty("mainWindow", this);
     connect(ui->quickWidget_MapView->rootObject(), SIGNAL(collisionDetected(int,int,qreal,qreal,qreal,qreal)),
             this, SLOT(logCollision(int,int,qreal,qreal,qreal,qreal)));
+
+    //for the grid show hide
+    connect(ui->toggleGridButton, &QPushButton::clicked, this, &MainWindow::onToggleGridButtonClicked);
 
 
 
@@ -248,3 +255,6 @@ void MainWindow::getRoute(double startLat, double startLong, double endLat, doub
 }
 
 // Remove the addCarsToAllRoads() function as it's no longer needed
+void MainWindow::onToggleGridButtonClicked() {
+    emit toggleHexGrid();
+}

@@ -41,6 +41,6 @@ public slots:
     void onRestartClicked();
     void onPauseButtonClicked();  // Added slot
     void onSliderValueChanged(int value);
-    Q_INVOKABLE void logCollision(int carIndex1, int carIndex2);
+    void logCollision(int carIndex1, int carIndex2, qreal speed1, qreal frequency1, qreal speed2, qreal frequency2);
 };
 #endif // MAINWINDOW_H

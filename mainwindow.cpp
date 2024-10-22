@@ -45,6 +45,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->pauseButton, &QPushButton::clicked, this, &MainWindow::onPauseButtonClicked);
     connect(ui->horizontalSlider, &QSlider::valueChanged, this, &MainWindow::onSliderValueChanged);
     ui->quickWidget_MapView->rootContext()->setContextProperty("mainWindow", this);
+    connect(ui->quickWidget_MapView->rootObject(), SIGNAL(collisionDetected(int,int,qreal,qreal,qreal,qreal)),
+            this, SLOT(logCollision(int,int,qreal,qreal,qreal,qreal)));
 
 
 
@@ -117,7 +119,7 @@ void MainWindow::onSliderValueChanged(int value) {
 }
 
 
-void MainWindow::logCollision(int carIndex1, int carIndex2)
+void MainWindow::logCollision(int carIndex1, int carIndex2, qreal speed1, qreal frequency1, qreal speed2, qreal frequency2)
 {
     // Normalize indices
     int minIndex = std::min(carIndex1, carIndex2);
@@ -126,7 +128,21 @@ void MainWindow::logCollision(int carIndex1, int carIndex2)
 
     if (!collisionSet.contains(pairKey)) {
         collisionSet.insert(pairKey);
-        QString message = QString("Connection detected between car %1 and car %2").arg(carIndex2+1).arg(carIndex1+1);
+
+        QString message = QString("Connection detected between car %1 and car %2{\n"
+                                  "  Car %1:\n"
+                                  "    Speed: %3 km/h\n"
+                                  "    Frequency: %4\n"
+                                  "  Car %2:\n"
+                                  "    Speed: %5 km/h\n"
+                                  "    Frequency: %6}")
+                              .arg(carIndex1 + 1)
+                              .arg(carIndex2 + 1)
+                              .arg(speed1)
+                              .arg(frequency1)
+                              .arg(speed2)
+                              .arg(frequency2);
+
         ui->logListWidget->addItem(message);
     }
 }

@@ -8,29 +8,32 @@ Rectangle {
     height: 600
 
     property double latitude: 47.729679
-    property double longitude: 7.321515
-    property int zoomLevel: 15
+        property double longitude: 7.321515
+        property int zoomLevel: 15
 
-    property Component locationmarker: locmaker
-    property var polylinePoints: []
-    property var polylines: []
+        property Component locationmarker: locmaker
+        property var polylinePoints: []
+        property var polylines: []
 
-    property bool simulationPaused: false
-    property var pathIndices: []
-    property var mapItems: []
-    property var carItems: []
-    property var carPaths: []
-    property var carTimers: []
+        // Add missing property declarations
+        property var carSpeeds: []
+        property var carFrequencies: []
+        property var carActive: []
 
-    property var carCircles: []
-    property var carRadii: []
-    property real baseCircleRadius: 50
+        property bool simulationPaused: false
+        property var pathIndices: []
+        property var mapItems: []
+        property var carItems: []
+        property var carPaths: []
+        property var carTimers: []
 
-    property real animationDuration: 20000 // 20 seconds to travel the whole path
-    signal collisionDetected(int carIndex1, int carIndex2)
-    property var collisionPairs: []
+        property var carCircles: []
+        property var carRadii: []
+        property real baseCircleRadius: 50
 
-
+        property real animationDuration: 20000
+        signal collisionDetected(int carIndex1, int carIndex2, real speed1, real frequency1, real speed2, real frequency2)
+        property var collisionPairs: []
 
     Plugin {
         id: mapPlugin
@@ -132,27 +135,37 @@ Rectangle {
     function addCarPath(coordinates) {
         carPaths.push(coordinates);
 
-        // Générer une vitesse aléatoire entre 1.5 et 3.0
-        var speedMultiplier = 1.5 + Math.random() * 1.5;
-
-        // Générer une fréquence aléatoire entre 0.5 et 2.0
+        // Generate random speed between 60 and 120 km/h
+        var speed = 60 + Math.random() * 60;
         var frequency = 0.5 + Math.random() * 1.5;
 
-        // Créer la voiture
+        carSpeeds.push(speed);
+        carFrequencies.push(frequency);
+        carActive.push(true);  // Initialize as active
+
+        var speedMultiplier = speed / 60;
+
+        // Create and add car
         var carItem = carComponent.createObject(mapview, {
             coordinate: coordinates[0],
             z: 2
         });
+
+        if (carItem === null) {
+            console.error("Failed to create car item");
+            return;
+        }
+
         mapview.addMapItem(carItem);
         carItems.push(carItem);
         mapItems.push(carItem);
 
-        // Créer le cercle autour de la voiture
+        // Create circle
         var circleRadius = baseCircleRadius * speedMultiplier * frequency;
         var circleItem = Qt.createQmlObject('import QtLocation 5.0; MapCircle {}', mapview);
         circleItem.center = coordinates[0];
         circleItem.radius = circleRadius;
-        circleItem.color = Qt.rgba(1, 0, 0, 0.2);  // Rouge semi-transparent
+        circleItem.color = Qt.rgba(1, 0, 0, 0.2);
         circleItem.border.width = 2;
         circleItem.border.color = "red";
         mapview.addMapItem(circleItem);
@@ -160,9 +173,12 @@ Rectangle {
         carRadii.push(circleRadius);
         mapItems.push(circleItem);
 
-        // Démarrer l'animation pour cette voiture
+        // Start animation
         animateCarAlongPath(carItems.length - 1, speedMultiplier, frequency);
+
+        console.log("Car added at index:", carItems.length - 1);
     }
+
 
     function animateCarAlongPath(carIndex, speedMultiplier, frequency) {
         var timer = Qt.createQmlObject('import QtQuick 2.0; Timer {}', window);
@@ -223,7 +239,14 @@ Rectangle {
                     var pairKey = currentCarIndex < i ? currentCarIndex + "-" + i : i + "-" + currentCarIndex;
                     if (collisionPairs.indexOf(pairKey) === -1) {
                         collisionPairs.push(pairKey);
-                        collisionDetected(currentCarIndex, i);
+                        collisionDetected(
+                            currentCarIndex,
+                            i,
+                            carSpeeds[currentCarIndex],
+                            carFrequencies[currentCarIndex],
+                            carSpeeds[i],
+                            carFrequencies[i]
+                        );
                     }
                 } else {
                     // No collision, reset colors
@@ -288,8 +311,11 @@ Rectangle {
         carItems = []
         carPaths = []
         collisionPairs = [];
+        if (hexGrid) {
+          hexGrid.resetGrid()
+      }
     }
-    onCollisionDetected: mainWindow.logCollision(carIndex1, carIndex2)
+    onCollisionDetected: mainWindow.logCollision(carIndex1, carIndex2, speed1, frequency1, speed2, frequency2)
     Component {
         id: carComponent
         MapQuickItem {
@@ -322,7 +348,8 @@ Rectangle {
     }
 
     HexagonalGrid {
+       id: hexGrid
        anchors.fill: parent
-       z: 1  // Ensure it is above the map
+       z: 1
    }
 }

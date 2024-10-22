@@ -23,6 +23,7 @@ private:
     Ui::MainWindow *ui;
     QList<QList<QGeoCoordinate>> generatedRoads;
     int m_pendingRoads;
+    QSet<QString> collisionSet;
 
 signals:
     void setCenterPosition(QVariant, QVariant);
@@ -40,5 +41,6 @@ public slots:
     void onRestartClicked();
     void onPauseButtonClicked();  // Added slot
     void onSliderValueChanged(int value);
+    Q_INVOKABLE void logCollision(int carIndex1, int carIndex2);
 };
 #endif // MAINWINDOW_H

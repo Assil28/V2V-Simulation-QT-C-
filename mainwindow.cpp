@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->quickWidget_MapView->setSource(QUrl(QStringLiteral("qrc:/QmlMaps.qml")));
     ui->quickWidget_MapView->show();
-
+    ui->panelWidget->setStyleSheet("background-color: rgba(0, 0, 0, 180);");
     QObject *rootObject = ui->quickWidget_MapView->rootObject();
 
     connect(this, SIGNAL(setCenterPosition(QVariant, QVariant)),
@@ -44,6 +44,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::onRestartClicked);
     connect(ui->pauseButton, &QPushButton::clicked, this, &MainWindow::onPauseButtonClicked);
     connect(ui->horizontalSlider, &QSlider::valueChanged, this, &MainWindow::onSliderValueChanged);
+    ui->quickWidget_MapView->rootContext()->setContextProperty("mainWindow", this);
+
 
 
 
@@ -101,6 +103,8 @@ void MainWindow::onRestartClicked() {
     // Clear the map
     generatedRoads.clear();
     emit clearMap();
+    collisionSet.clear();
+    ui->logListWidget->clear();
     // Generate new roads
     // generateRandomRoads(5);
 
@@ -113,6 +117,19 @@ void MainWindow::onSliderValueChanged(int value) {
 }
 
 
+void MainWindow::logCollision(int carIndex1, int carIndex2)
+{
+    // Normalize indices
+    int minIndex = std::min(carIndex1, carIndex2);
+    int maxIndex = std::max(carIndex1, carIndex2);
+    QString pairKey = QString("%1-%2").arg(minIndex).arg(maxIndex);
+
+    if (!collisionSet.contains(pairKey)) {
+        collisionSet.insert(pairKey);
+        QString message = QString("Connection detected between car %1 and car %2").arg(carIndex2+1).arg(carIndex1+1);
+        ui->logListWidget->addItem(message);
+    }
+}
 
 /*******************************************/
 

@@ -22,13 +22,21 @@ Rectangle {
     property var carPaths: []
     property var carTimers: []
 
+    property var carCircles: []
+    property var carRadii: []
+    property real baseCircleRadius: 50
+
     property real animationDuration: 20000 // 20 seconds to travel the whole path
+    signal collisionDetected(int carIndex1, int carIndex2)
+    property var collisionPairs: []
+
+
 
     Plugin {
         id: mapPlugin
         name: "osm"
         PluginParameter { name: "osm.mapping.custom.host"; value: "https://tile.openstreetmap.org/" }
-    }
+}
 
     Map {
         id: mapview
@@ -119,8 +127,18 @@ Rectangle {
     }
 
 
+
+
     function addCarPath(coordinates) {
         carPaths.push(coordinates);
+
+        // Générer une vitesse aléatoire entre 1.5 et 3.0
+        var speedMultiplier = 1.5 + Math.random() * 1.5;
+
+        // Générer une fréquence aléatoire entre 0.5 et 2.0
+        var frequency = 0.5 + Math.random() * 1.5;
+
+        // Créer la voiture
         var carItem = carComponent.createObject(mapview, {
             coordinate: coordinates[0],
             z: 2
@@ -129,22 +147,31 @@ Rectangle {
         carItems.push(carItem);
         mapItems.push(carItem);
 
-        // Start animation for this car
-        animateCarAlongPath(carItems.length - 1);
+        // Créer le cercle autour de la voiture
+        var circleRadius = baseCircleRadius * speedMultiplier * frequency;
+        var circleItem = Qt.createQmlObject('import QtLocation 5.0; MapCircle {}', mapview);
+        circleItem.center = coordinates[0];
+        circleItem.radius = circleRadius;
+        circleItem.color = Qt.rgba(1, 0, 0, 0.2);  // Rouge semi-transparent
+        circleItem.border.width = 2;
+        circleItem.border.color = "red";
+        mapview.addMapItem(circleItem);
+        carCircles.push(circleItem);
+        carRadii.push(circleRadius);
+        mapItems.push(circleItem);
+
+        // Démarrer l'animation pour cette voiture
+        animateCarAlongPath(carItems.length - 1, speedMultiplier, frequency);
     }
 
-
-    function animateCarAlongPath(carIndex) {
+    function animateCarAlongPath(carIndex, speedMultiplier, frequency) {
         var timer = Qt.createQmlObject('import QtQuick 2.0; Timer {}', window);
-
-        // Generate a random speed multiplier between 1.5 and 3.0
-        var speedMultiplier = 1.5 + Math.random() * 1.5;
 
         timer.interval = 100 / speedMultiplier;
         timer.repeat = true;
         carTimers.push(timer);
 
-        pathIndices[carIndex] = 0;  // Initialize pathIndex for this car
+        pathIndices[carIndex] = 0;  // Initialiser pathIndex pour cette voiture
 
         timer.triggered.connect(function() {
             var pathIndex = pathIndices[carIndex];
@@ -159,14 +186,61 @@ Rectangle {
                 );
 
                 carItems[carIndex].coordinate = interpolatedPosition;
+                carCircles[carIndex].center = interpolatedPosition;
 
-                pathIndices[carIndex] = pathIndex + 1;  // Update pathIndex
+                checkCollisions(carIndex);
+
+                pathIndices[carIndex] = pathIndex + 1;  // Mettre à jour pathIndex
             } else {
                 timer.stop();
+                carActive[carIndex] = false;  // Marquer la voiture comme inactive
+                checkCollisions();
             }
         });
 
         timer.start();
+    }
+
+
+    function checkCollisions(currentCarIndex) {
+        var currentCar = carCircles[currentCarIndex];
+        var currentRadius = carRadii[currentCarIndex];
+
+        for (var i = 0; i < carCircles.length; i++) {
+            if (i !== currentCarIndex) {
+                var otherCar = carCircles[i];
+                var otherRadius = carRadii[i];
+                var distance = currentCar.center.distanceTo(otherCar.center);
+
+                if (distance < (currentRadius + otherRadius)) {
+                    // Collision detected
+                    currentCar.color = Qt.rgba(0, 1, 0, 0.2);
+                    currentCar.border.color = "green";
+                    otherCar.color = Qt.rgba(0, 1, 0, 0.2);
+                    otherCar.border.color = "green";
+
+                    // Emit signal if collision not already reported
+                    var pairKey = currentCarIndex < i ? currentCarIndex + "-" + i : i + "-" + currentCarIndex;
+                    if (collisionPairs.indexOf(pairKey) === -1) {
+                        collisionPairs.push(pairKey);
+                        collisionDetected(currentCarIndex, i);
+                    }
+                } else {
+                    // No collision, reset colors
+                    currentCar.color = Qt.rgba(1, 0, 0, 0.2);
+                    currentCar.border.color = "red";
+                    otherCar.color = Qt.rgba(1, 0, 0, 0.2);
+                    otherCar.border.color = "red";
+
+                    // Remove collision from collisionPairs if present
+                    var pairKey = currentCarIndex < i ? currentCarIndex + "-" + i : i + "-" + currentCarIndex;
+                    var index = collisionPairs.indexOf(pairKey);
+                    if (index !== -1) {
+                        collisionPairs.splice(index, 1);
+                    }
+                }
+            }
+        }
     }
 
 
@@ -202,11 +276,20 @@ Rectangle {
         }
         mapItems = []
 
+        // Supprimer et détruire les cercles des voitures
+        for (var i = 0; i < carCircles.length; i++) {
+                    mapview.removeMapItem(carCircles[i]);
+                    carCircles[i].destroy();
+                }
+                carCircles = [];
+                carRadii = [];
+
         // Clear other data
         carItems = []
         carPaths = []
+        collisionPairs = [];
     }
-
+    onCollisionDetected: mainWindow.logCollision(carIndex1, carIndex2)
     Component {
         id: carComponent
         MapQuickItem {

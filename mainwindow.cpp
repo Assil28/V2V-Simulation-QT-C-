@@ -38,12 +38,15 @@ MainWindow::MainWindow(QWidget *parent)
             rootObject, SLOT(clearMap()));
     connect(this, SIGNAL(togglePauseSimulation()),
             rootObject, SLOT(togglePauseSimulation()));
+    connect(this, SIGNAL(toggleHexGrid()),
+            rootObject, SLOT(toggleHexGrid()));
 
     // Connect buttons and slider
     connect(ui->pushButton_2, &QPushButton::clicked, this, &MainWindow::onStartSimulationClicked);
     connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::onRestartClicked);
     connect(ui->pauseButton, &QPushButton::clicked, this, &MainWindow::onPauseButtonClicked);
     connect(ui->horizontalSlider, &QSlider::valueChanged, this, &MainWindow::onSliderValueChanged);
+    connect(ui->toggleGridButton, &QPushButton::clicked, this, &MainWindow::onToggleGridButtonClicked);
 
 
 
@@ -222,3 +225,6 @@ void MainWindow::getRoute(double startLat, double startLong, double endLat, doub
     });
 }
 
+void MainWindow::onToggleGridButtonClicked() {
+    emit toggleHexGrid();
+}

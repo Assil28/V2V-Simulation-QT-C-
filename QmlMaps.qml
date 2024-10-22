@@ -30,6 +30,7 @@ Rectangle {
     property real animationDuration: 20000 // 20 seconds to travel the whole path
 
     property real speedMultiplier: 1.0
+    property bool hexGridVisible: true
 
     Plugin {
         id: mapPlugin
@@ -278,6 +279,10 @@ Rectangle {
         }
     }
 
+    function toggleHexGrid() {
+        hexGridVisible = !hexGridVisible;
+    }
+
     Component {
         id: carComponent
         MapQuickItem {
@@ -313,5 +318,6 @@ Rectangle {
         id: hexGrid
         anchors.fill: parent
         z: 1
+        visible: hexGridVisible  // Ajouter cette ligne
     }
 }

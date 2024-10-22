@@ -63,7 +63,13 @@ MainWindow::MainWindow(QWidget *parent)
     std::srand(std::time(0));
 
     //generateRandomRoads(5);
+
+    // Configure the slider
+    ui->horizontalSlider->setMinimum(0);
+    ui->horizontalSlider->setMaximum(100);
+    ui->horizontalSlider->setValue(50);  // Set default value to middle
 }
+
 
 MainWindow::~MainWindow()
 {
@@ -121,8 +127,11 @@ void MainWindow::onRestartClicked() {
 
 // Slot pour récupérer la valeur du slider
 void MainWindow::onSliderValueChanged(int value) {
-    qDebug() << "Valeur du slider:" << value;
-    // Utilisez la valeur du slider ici
+    // Convert slider value (0-100) to speed multiplier (0.1 to 2.0)
+    double speedMultiplier = 0.1 + (value / 100.0) * 1.9;
+    QObject *rootObject = ui->quickWidget_MapView->rootObject();
+    QMetaObject::invokeMethod(rootObject, "updateCarSpeeds",
+                              Q_ARG(QVariant, QVariant::fromValue(speedMultiplier)));
 }
 
 
@@ -158,10 +167,10 @@ void MainWindow::logCollision(int carIndex1, int carIndex2, qreal speed1, qreal 
 
 
 void MainWindow::generateRandomRoads(int numberOfRoads) {
-    constexpr double MIN_LAT = 47.7200;
-    constexpr double MAX_LAT = 47.7700;
-    constexpr double MIN_LONG = 7.3000;
-    constexpr double MAX_LONG = 7.3500;
+    constexpr double MIN_LAT = 47.72196;
+    constexpr double MAX_LAT = 47.74145;
+    constexpr double MIN_LONG = 7.34672;
+    constexpr double MAX_LONG = 7.29112;
     constexpr double MIN_DISTANCE = 0.01;
 
     std::random_device rd;

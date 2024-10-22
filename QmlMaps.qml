@@ -35,6 +35,9 @@ Rectangle {
         property real animationDuration: 20000
         signal collisionDetected(int carIndex1, int carIndex2, real speed1, real frequency1, real speed2, real frequency2)
         property var collisionPairs: []
+
+    // vitesse
+       property real speedMultiplier: 1.0
     // for show and hide grid
      property bool hexGridVisible: true
 
@@ -59,7 +62,7 @@ Rectangle {
             z: 1
         }
 
-        MouseArea {
+        /*MouseArea {
             anchors.fill: parent
             drag.target: mapview
             acceptedButtons: Qt.LeftButton | Qt.RightButton
@@ -94,7 +97,8 @@ Rectangle {
                 }
                 mapview.zoomLevel = window.zoomLevel;
             }
-        }
+
+        }*/
 
 
 
@@ -187,7 +191,8 @@ Rectangle {
     function animateCarAlongPath(carIndex, speedMultiplier, frequency) {
         var timer = Qt.createQmlObject('import QtQuick 2.0; Timer {}', window);
 
-        timer.interval = 100 / speedMultiplier;
+        // Modify the interval calculation to use the global speedMultiplier
+                timer.interval = (100 / speedMultiplier) * (1 / window.speedMultiplier);
         timer.repeat = true;
         carTimers.push(timer);
 
@@ -199,11 +204,12 @@ Rectangle {
                 var start = carPaths[carIndex][pathIndex];
                 var end = carPaths[carIndex][pathIndex + 1];
 
-                var progress = (timer.interval / (animationDuration * speedMultiplier)) * carPaths[carIndex].length;
-                var interpolatedPosition = QtPositioning.coordinate(
-                    start.latitude + (end.latitude - start.latitude) * progress,
-                    start.longitude + (end.longitude - start.longitude) * progress
-                );
+                // Adjust progress calculation to use the global speedMultiplier
+           var progress = (timer.interval * window.speedMultiplier / (animationDuration * speedMultiplier)) * carPaths[carIndex].length;
+           var interpolatedPosition = QtPositioning.coordinate(
+               start.latitude + (end.latitude - start.latitude) * progress,
+               start.longitude + (end.longitude - start.longitude) * progress
+           );
 
                 carItems[carIndex].coordinate = interpolatedPosition;
                 carCircles[carIndex].center = interpolatedPosition;
@@ -219,6 +225,17 @@ Rectangle {
         });
 
         timer.start();
+    }
+
+
+    // Add a function to update all car speeds
+    function updateCarSpeeds(multiplier) {
+        speedMultiplier = multiplier;
+        for (var i = 0; i < carTimers.length; i++) {
+            if (carTimers[i].running) {
+                carTimers[i].interval = (100 / speedMultiplier) * (1 / window.speedMultiplier);
+            }
+        }
     }
 
 

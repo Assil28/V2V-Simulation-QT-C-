@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1451</width>
-    <height>778</height>
+    <height>765</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -90,7 +90,7 @@
       <x>1080</x>
       <y>0</y>
       <width>371</width>
-      <height>731</height>
+      <height>751</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -99,10 +99,10 @@
        <widget class="QWidget" name="panelWidget" native="true">
         <property name="geometry">
          <rect>
-          <x>80</x>
+          <x>0</x>
           <y>-50</y>
-          <width>291</width>
-          <height>781</height>
+          <width>371</width>
+          <height>791</height>
          </rect>
         </property>
         <property name="styleSheet">
@@ -116,13 +116,13 @@
           <rect>
            <x>0</x>
            <y>50</y>
-           <width>431</width>
-           <height>721</height>
+           <width>371</width>
+           <height>741</height>
           </rect>
          </property>
          <property name="styleSheet">
           <string>
-                background-color: rgba(0, 0, 0, 180);  /* Black with transparency */
+                background-color: rgba(0, 0, 0, 60);  /* Black with transparency */
                 color: white;  /* White text */
             </string>
          </property>
@@ -139,7 +139,7 @@
      <x>0</x>
      <y>0</y>
      <width>1451</width>
-     <height>26</height>
+     <height>19</height>
     </rect>
    </property>
   </widget>

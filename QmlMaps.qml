@@ -41,6 +41,8 @@ Rectangle {
     // for show and hide grid
      property bool hexGridVisible: true
 
+
+
     Plugin {
         id: mapPlugin
         name: "osm"
@@ -122,8 +124,8 @@ Rectangle {
 
 
     function drawPathWithCoordinates(coordinates) {
-        var transparentPolyline = Qt.createQmlObject('import QtLocation 5.0; MapPolyline { line.width: 10; line.color: "blue"; path: []; z: 1 }', mapview);
-        var borderPolyline = Qt.createQmlObject('import QtLocation 5.0; MapPolyline { line.width: 5; line.color: "white"; path: []; z: 1 }', mapview);
+        var transparentPolyline = Qt.createQmlObject('import QtLocation 5.0; MapPolyline { line.width: 5; line.color: "blue"; path: []; z: 1 }', mapview);
+        var borderPolyline = Qt.createQmlObject('import QtLocation 5.0; MapPolyline { line.width: 2.5; line.color: "white"; path: []; z: 1 }', mapview);
 
         for (var i = 0; i < coordinates.length; i++) {
             transparentPolyline.path.push(coordinates[i]);

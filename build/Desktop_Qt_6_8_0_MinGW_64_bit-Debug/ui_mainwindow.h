@@ -50,7 +50,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName("MainWindow");
-        MainWindow->resize(1451, 778);
+        MainWindow->resize(1451, 765);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName("centralwidget");
         quickWidget_MapView = new QQuickWidget(centralwidget);
@@ -97,7 +97,7 @@ public:
 
         verticalLayoutWidget = new QWidget(centralwidget);
         verticalLayoutWidget->setObjectName("verticalLayoutWidget");
-        verticalLayoutWidget->setGeometry(QRect(1080, 0, 371, 731));
+        verticalLayoutWidget->setGeometry(QRect(1080, 0, 371, 751));
         verticalLayout = new QVBoxLayout(verticalLayoutWidget);
         verticalLayout->setObjectName("verticalLayout");
         verticalLayout->setContentsMargins(0, 0, 0, 0);
@@ -105,17 +105,17 @@ public:
         widget->setObjectName("widget");
         panelWidget = new QWidget(widget);
         panelWidget->setObjectName("panelWidget");
-        panelWidget->setGeometry(QRect(80, -50, 291, 781));
+        panelWidget->setGeometry(QRect(0, -50, 371, 791));
         logListWidget = new QListWidget(panelWidget);
         logListWidget->setObjectName("logListWidget");
-        logListWidget->setGeometry(QRect(0, 50, 431, 721));
+        logListWidget->setGeometry(QRect(0, 50, 371, 741));
 
         verticalLayout->addWidget(widget);
 
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName("menubar");
-        menubar->setGeometry(QRect(0, 0, 1451, 26));
+        menubar->setGeometry(QRect(0, 0, 1451, 19));
         MainWindow->setMenuBar(menubar);
         statusbar = new QStatusBar(MainWindow);
         statusbar->setObjectName("statusbar");
@@ -138,7 +138,7 @@ public:
 "                color: white;\n"
 "            ", nullptr));
         logListWidget->setStyleSheet(QCoreApplication::translate("MainWindow", "\n"
-"                background-color: rgba(0, 0, 0, 180);  /* Black with transparency */\n"
+"                background-color: rgba(0, 0, 0, 60);  /* Black with transparency */\n"
 "                color: white;  /* White text */\n"
 "            ", nullptr));
     } // retranslateUi

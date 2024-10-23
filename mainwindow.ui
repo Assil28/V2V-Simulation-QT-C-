@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1451</width>
-    <height>765</height>
+    <height>778</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,9 +30,9 @@
    <widget class="QWidget" name="horizontalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>100</x>
       <y>0</y>
-      <width>561</width>
+      <width>951</width>
       <height>31</height>
      </rect>
     </property>
@@ -41,8 +41,8 @@
       <widget class="QLineEdit" name="numCars">
        <property name="maximumSize">
         <size>
-         <width>35</width>
-         <height>23</height>
+         <width>50</width>
+         <height>16777215</height>
         </size>
        </property>
       </widget>
@@ -63,15 +63,6 @@
      </item>
      <item>
       <widget class="QSlider" name="horizontalSlider">
-       <property name="minimum">
-        <number>0</number>
-       </property>
-       <property name="maximum">
-        <number>100</number>
-       </property>
-       <property name="value">
-        <number>50</number>
-       </property>
        <property name="orientation">
         <enum>Qt::Orientation::Horizontal</enum>
        </property>
@@ -85,12 +76,60 @@
       </widget>
      </item>
      <item>
-        <widget class="QPushButton" name="toggleGridButton">
-        <property name="text">
+      <widget class="QPushButton" name="toggleGridButton">
+       <property name="text">
         <string>Afficher/Cacher Grille</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>1080</x>
+      <y>0</y>
+      <width>371</width>
+      <height>731</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QWidget" name="widget" native="true">
+       <widget class="QWidget" name="panelWidget" native="true">
+        <property name="geometry">
+         <rect>
+          <x>80</x>
+          <y>-50</y>
+          <width>291</width>
+          <height>781</height>
+         </rect>
         </property>
+        <property name="styleSheet">
+         <string>
+                background-color: rgba(0, 0, 0, 180);
+                color: white;
+            </string>
+        </property>
+        <widget class="QListWidget" name="logListWidget">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>50</y>
+           <width>431</width>
+           <height>721</height>
+          </rect>
+         </property>
+         <property name="styleSheet">
+          <string>
+                background-color: rgba(0, 0, 0, 180);  /* Black with transparency */
+                color: white;  /* White text */
+            </string>
+         </property>
         </widget>
-    </item>
+       </widget>
+      </widget>
+     </item>
     </layout>
    </widget>
   </widget>
@@ -100,7 +139,7 @@
      <x>0</x>
      <y>0</y>
      <width>1451</width>
-     <height>25</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>

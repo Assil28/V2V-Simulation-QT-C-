@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->quickWidget_MapView->setSource(QUrl(QStringLiteral("qrc:/QmlMaps.qml")));
     ui->quickWidget_MapView->show();
-
+    ui->panelWidget->setStyleSheet("background-color: rgba(0, 0, 0, 180);");
     QObject *rootObject = ui->quickWidget_MapView->rootObject();
 
     connect(this, SIGNAL(setCenterPosition(QVariant, QVariant)),
@@ -40,17 +40,22 @@ MainWindow::MainWindow(QWidget *parent)
             rootObject, SLOT(togglePauseSimulation()));
 
     //for the grid shhow hide
-     connect(this, SIGNAL(toggleHexGrid()),
+    connect(this, SIGNAL(toggleHexGrid()),
             rootObject, SLOT(toggleHexGrid()));
-    
+
     // Connect buttons and slider
     connect(ui->pushButton_2, &QPushButton::clicked, this, &MainWindow::onStartSimulationClicked);
     connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::onRestartClicked);
     connect(ui->pauseButton, &QPushButton::clicked, this, &MainWindow::onPauseButtonClicked);
     connect(ui->horizontalSlider, &QSlider::valueChanged, this, &MainWindow::onSliderValueChanged);
+    ui->quickWidget_MapView->rootContext()->setContextProperty("mainWindow", this);
+    connect(ui->quickWidget_MapView->rootObject(), SIGNAL(collisionDetected(int,int,qreal,qreal,qreal,qreal)),
+            this, SLOT(logCollision(int,int,qreal,qreal,qreal,qreal)));
 
     //for the grid show hide
     connect(ui->toggleGridButton, &QPushButton::clicked, this, &MainWindow::onToggleGridButtonClicked);
+
+
 
 
     emit setCenterPosition(47.729679, 7.321515);
@@ -58,7 +63,13 @@ MainWindow::MainWindow(QWidget *parent)
     std::srand(std::time(0));
 
     //generateRandomRoads(5);
+
+    // Configure the slider
+    ui->horizontalSlider->setMinimum(0);
+    ui->horizontalSlider->setMaximum(100);
+    ui->horizontalSlider->setValue(50);  // Set default value to middle
 }
+
 
 MainWindow::~MainWindow()
 {
@@ -107,6 +118,8 @@ void MainWindow::onRestartClicked() {
     // Clear the map
     generatedRoads.clear();
     emit clearMap();
+    collisionSet.clear();
+    ui->logListWidget->clear();
     // Generate new roads
     // generateRandomRoads(5);
 
@@ -114,11 +127,41 @@ void MainWindow::onRestartClicked() {
 
 // Slot pour récupérer la valeur du slider
 void MainWindow::onSliderValueChanged(int value) {
-    qDebug() << "Valeur du slider:" << value;
-    // Utilisez la valeur du slider ici
+    // Convert slider value (0-100) to speed multiplier (0.1 to 2.0)
+    double speedMultiplier = 0.1 + (value / 100.0) * 1.9;
+    QObject *rootObject = ui->quickWidget_MapView->rootObject();
+    QMetaObject::invokeMethod(rootObject, "updateCarSpeeds",
+                              Q_ARG(QVariant, QVariant::fromValue(speedMultiplier)));
 }
 
 
+void MainWindow::logCollision(int carIndex1, int carIndex2, qreal speed1, qreal frequency1, qreal speed2, qreal frequency2)
+{
+    // Normalize indices
+    int minIndex = std::min(carIndex1, carIndex2);
+    int maxIndex = std::max(carIndex1, carIndex2);
+    QString pairKey = QString("%1-%2").arg(minIndex).arg(maxIndex);
+
+    if (!collisionSet.contains(pairKey)) {
+        collisionSet.insert(pairKey);
+
+        QString message = QString("Connection detected between car %1 and car %2{\n"
+                                  "  Car %1:\n"
+                                  "    Speed: %3 km/h\n"
+                                  "    Frequency: %4\n"
+                                  "  Car %2:\n"
+                                  "    Speed: %5 km/h\n"
+                                  "    Frequency: %6}")
+                              .arg(carIndex1 + 1)
+                              .arg(carIndex2 + 1)
+                              .arg(speed1)
+                              .arg(frequency1)
+                              .arg(speed2)
+                              .arg(frequency2);
+
+        ui->logListWidget->addItem(message);
+    }
+}
 
 /*******************************************/
 
@@ -220,8 +263,7 @@ void MainWindow::getRoute(double startLat, double startLong, double endLat, doub
     });
 }
 
-
-
+// Remove the addCarsToAllRoads() function as it's no longer needed
 void MainWindow::onToggleGridButtonClicked() {
     emit toggleHexGrid();
 }

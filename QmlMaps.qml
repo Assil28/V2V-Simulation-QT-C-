@@ -41,7 +41,15 @@ Rectangle {
     // for show and hide grid
      property bool hexGridVisible: true
 
-
+    property var circleColors: [
+            { fill: Qt.rgba(1, 0, 0, 0.2), border: "red" },
+            { fill: Qt.rgba(0, 0, 1, 0.2), border: "blue" },
+            { fill: Qt.rgba(0.5, 0, 0.5, 0.2), border: "purple" },
+            { fill: Qt.rgba(1, 0.5, 0, 0.2), border: "orange" },
+            { fill: Qt.rgba(0, 0.5, 0.5, 0.2), border: "teal" },
+            { fill: Qt.rgba(0.5, 0.25, 0, 0.2), border: "brown" }
+        ]
+        property int currentColorIndex: 0
 
     Plugin {
         id: mapPlugin
@@ -169,19 +177,24 @@ Rectangle {
         carItems.push(carItem);
         mapItems.push(carItem);
 
-        // Create circle
-        var circleRadius = baseCircleRadius * speedMultiplier * frequency;
-        var circleItem = Qt.createQmlObject('import QtLocation 5.0; MapCircle {}', mapview);
-        circleItem.center = coordinates[0];
-        circleItem.radius = circleRadius;
-        circleItem.color = Qt.rgba(1, 0, 0, 0.2);
-        circleItem.border.width = 2;
-        circleItem.border.color = "red";
-        mapview.addMapItem(circleItem);
-        carCircles.push(circleItem);
-        carRadii.push(circleRadius);
-        carActive.push(true);
-        mapItems.push(circleItem);
+        // Sélectionner une couleur pour le cercle
+               var colorIndex = currentColorIndex % circleColors.length;
+               var currentColor = circleColors[colorIndex];
+               currentColorIndex++;
+
+        // Create circle with the selected color
+              var circleRadius = baseCircleRadius * speedMultiplier * frequency;
+              var circleItem = Qt.createQmlObject('import QtLocation 5.0; MapCircle {}', mapview);
+              circleItem.center = coordinates[0];
+              circleItem.radius = circleRadius;
+              circleItem.color = currentColor.fill;
+              circleItem.border.width = 2;
+              circleItem.border.color = currentColor.border;
+              mapview.addMapItem(circleItem);
+              carCircles.push(circleItem);
+              carRadii.push(circleRadius);
+              carActive.push(true);
+              mapItems.push(circleItem);
 
         // Start animation
         animateCarAlongPath(carItems.length - 1, speedMultiplier, frequency);
@@ -242,50 +255,37 @@ Rectangle {
 
 
     function checkCollisions() {
-        // Reset all car colors to the default (red) at the start
-        for (var i = 0; i < carCircles.length; i++) {
-            carCircles[i].color = Qt.rgba(1, 0, 0, 0.2);  // Red semi-transparent
-            carCircles[i].border.color = "red";
-        }
+            // Check for collisions between all cars
+            for (var i = 0; i < carCircles.length; i++) {
+                var inCollision = false;
 
-        // Check for collisions between all cars
-        for (var i = 0; i < carCircles.length; i++) {
-            for (var j = i + 1; j < carCircles.length; j++) {
-                var distance = carCircles[i].center.distanceTo(carCircles[j].center);
+                for (var j = i + 1; j < carCircles.length; j++) {
+                    var distance = carCircles[i].center.distanceTo(carCircles[j].center);
 
-                if (distance < (carRadii[i] + carRadii[j])) {
-                    // Collision detected
-                    carCircles[i].color = Qt.rgba(0, 1, 0, 0.2);  // Green semi-transparent
-                    carCircles[i].border.color = "green";
-                    carCircles[j].color = Qt.rgba(0, 1, 0, 0.2);  // Green semi-transparent
-                    carCircles[j].border.color = "green";
+                    if (distance < (carRadii[i] + carRadii[j])) {
+                        // Collision detected
+                        carCircles[i].color = Qt.rgba(0, 1, 0, 0.2);  // Green pour collision
+                        carCircles[i].border.color = "green";
+                        carCircles[j].color = Qt.rgba(0, 1, 0, 0.2);
+                        carCircles[j].border.color = "green";
+                        inCollision = true;
 
-                    // Create a unique key for this collision pair
-                    var pairKey = i < j ? i + "-" + j : j + "-" + i;
-
-                    // Emit the collisionDetected signal if this collision hasn't been reported yet
-                    if (collisionPairs.indexOf(pairKey) === -1) {
-                        collisionPairs.push(pairKey);
-                        collisionDetected(
-                            i,
-                            j,
-                            carSpeeds[i],
-                            carFrequencies[i],
-                            carSpeeds[j],
-                            carFrequencies[j]
-                        );
+                        var pairKey = i < j ? i + "-" + j : j + "-" + i;
+                        if (collisionPairs.indexOf(pairKey) === -1) {
+                            collisionPairs.push(pairKey);
+                            collisionDetected(i, j, carSpeeds[i], carFrequencies[i], carSpeeds[j], carFrequencies[j]);
+                        }
                     }
-                } else {
-                    // If no collision for this pair, remove it from the collisionPairs if previously detected
-                    var pairKey = i < j ? i + "-" + j : j + "-" + i;
-                    var index = collisionPairs.indexOf(pairKey);
-                    if (index !== -1) {
-                        collisionPairs.splice(index, 1);
-                    }
+                }
+
+                // Si pas de collision, restaurer la couleur originale
+                if (!inCollision) {
+                    var originalColorIndex = i % circleColors.length;
+                    carCircles[i].color = circleColors[originalColorIndex].fill;
+                    carCircles[i].border.color = circleColors[originalColorIndex].border;
                 }
             }
         }
-    }
 
 
     function togglePauseSimulation() {

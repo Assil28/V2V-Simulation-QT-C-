@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>QmlMaps.qml</file>
+        <file>HexagonalGrid.qml</file>
+        <file>car.svg</file>
     </qresource>
 </RCC>

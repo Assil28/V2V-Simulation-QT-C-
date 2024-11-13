@@ -23,6 +23,7 @@ private:
     Ui::MainWindow *ui;
     QList<QList<QGeoCoordinate>> generatedRoads;
     int m_pendingRoads;
+    QSet<QString> collisionSet;
 
 signals:
     void setCenterPosition(QVariant, QVariant);
@@ -30,8 +31,8 @@ signals:
     void drawPathWithCoordinates(QVariant coordinates);
     void addCarPath(QVariant coordinates);
     void clearMap();
-    void togglePauseSimulation();  // Added signal
     void toggleHexGrid();
+    void togglePauseSimulation();  // Added signal
 
 public slots:
     void getRoute(double startLat, double startLong, double endLat, double endLong);
@@ -41,8 +42,9 @@ public slots:
     void onRestartClicked();
     void onPauseButtonClicked();  // Added slot
     void onSliderValueChanged(int value);
-
+    void logCollision(int carIndex1, int carIndex2, qreal speed1, qreal frequency1, qreal speed2, qreal frequency2);
 private slots:
     void onToggleGridButtonClicked();
+    void onToggleLogButtonClicked();
 };
 #endif // MAINWINDOW_H

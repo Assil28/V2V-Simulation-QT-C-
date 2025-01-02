@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>V2V Simulation</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QQuickWidget" name="quickWidget_MapView">
@@ -38,19 +38,22 @@
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QLineEdit" name="numCars">
+      <widget class="QLineEdit" name="numCarsInput">
        <property name="maximumSize">
         <size>
          <width>50</width>
          <height>16777215</height>
         </size>
        </property>
+       <property name="placeholderText">
+        <string>Cars</string>
+       </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_2">
+      <widget class="QPushButton" name="startButton">
        <property name="text">
-        <string>Demarrer la simulation</string>
+        <string>Start Simulation</string>
        </property>
       </widget>
      </item>
@@ -62,23 +65,44 @@
       </widget>
      </item>
      <item>
-      <widget class="QSlider" name="horizontalSlider">
+      <widget class="QSlider" name="speedSlider">
        <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
+        <enum>Qt::Horizontal</enum>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="restartButton">
        <property name="text">
-        <string>nettoyer la map</string>
+        <string>Clear Map</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="toggleGridButton">
+      <widget class="QPushButton" name="gridButton">
        <property name="text">
-        <string>Afficher/Cacher Grille</string>
+        <string>Toggle Grid</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="offlineButton">
+       <property name="text">
+        <string>Switch to Offline</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="saveButton">
+       <property name="text">
+        <string>Save Paths</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="loadButton">
+       <property name="text">
+        <string>Load Paths</string>
        </property>
       </widget>
      </item>
@@ -106,10 +130,7 @@
          </rect>
         </property>
         <property name="styleSheet">
-         <string>
-                background-color: rgba(0, 0, 0, 180);
-                color: white;
-            </string>
+         <string>background-color: rgba(0, 0, 0, 180); color: white;</string>
         </property>
         <widget class="QListWidget" name="logListWidget">
          <property name="geometry">
@@ -121,10 +142,7 @@
           </rect>
          </property>
          <property name="styleSheet">
-          <string>
-                background-color: rgba(0, 0, 0, 60);  /* Black with transparency */
-                color: white;  /* White text */
-            </string>
+          <string>background-color: rgba(0, 0, 0, 60); color: white;</string>
          </property>
         </widget>
        </widget>
@@ -139,7 +157,7 @@
      <x>0</x>
      <y>0</y>
      <width>1451</width>
-     <height>19</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>

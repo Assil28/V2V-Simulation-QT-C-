@@ -12,7 +12,7 @@
 #include <ctime>
 #include <random>
 #include <QMessageBox>
-//hhhh
+#include <cmath>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -26,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->panelWidget->setStyleSheet("background-color: rgba(0, 0, 0, 180);");
     QObject *rootObject = ui->quickWidget_MapView->rootObject();
 
+    // Connect QML signals and slots
     connect(this, SIGNAL(setCenterPosition(QVariant, QVariant)),
             rootObject, SLOT(setCenterPosition(QVariant, QVariant)));
     connect(this, SIGNAL(setLocationMarking(QVariant, QVariant)),
@@ -38,50 +39,41 @@ MainWindow::MainWindow(QWidget *parent)
             rootObject, SLOT(clearMap()));
     connect(this, SIGNAL(togglePauseSimulation()),
             rootObject, SLOT(togglePauseSimulation()));
-
-    //for the grid shhow hide
     connect(this, SIGNAL(toggleHexGrid()),
             rootObject, SLOT(toggleHexGrid()));
 
-    // Connect buttons and slider
+    // Connect UI elements
     connect(ui->pushButton_2, &QPushButton::clicked, this, &MainWindow::onStartSimulationClicked);
     connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::onRestartClicked);
     connect(ui->pauseButton, &QPushButton::clicked, this, &MainWindow::onPauseButtonClicked);
     connect(ui->horizontalSlider, &QSlider::valueChanged, this, &MainWindow::onSliderValueChanged);
+    connect(ui->toggleGridButton, &QPushButton::clicked, this, &MainWindow::onToggleGridButtonClicked);
+
+    // Set up QML context
     ui->quickWidget_MapView->rootContext()->setContextProperty("mainWindow", this);
     connect(ui->quickWidget_MapView->rootObject(), SIGNAL(collisionDetected(int,int,qreal,qreal,qreal,qreal)),
             this, SLOT(logCollision(int,int,qreal,qreal,qreal,qreal)));
 
-    //for the grid show hide
-    connect(ui->toggleGridButton, &QPushButton::clicked, this, &MainWindow::onToggleGridButtonClicked);
-
-
-
-
+    // Initialize map center
     emit setCenterPosition(47.729679, 7.321515);
 
+    // Initialize random seed
     std::srand(std::time(0));
-
-    //generateRandomRoads(5);
 
     // Configure the slider
     ui->horizontalSlider->setMinimum(0);
     ui->horizontalSlider->setMaximum(100);
-    ui->horizontalSlider->setValue(50);  // Set default value to middle
+    ui->horizontalSlider->setValue(50);
 }
-
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
 
-/*******************Bouttons et slide bar**********************/
-// Slot pour démarrer la simulation
 void MainWindow::onStartSimulationClicked() {
-    qDebug() << "Démarrer la simulation";
+    qDebug() << "Starting simulation";
 
-    // Get the number of cars from the numCars line edit
     bool ok;
     int numberOfCars = ui->numCars->text().toInt(&ok);
     if (!ok || numberOfCars <= 0) {
@@ -90,54 +82,69 @@ void MainWindow::onStartSimulationClicked() {
         return;
     }
 
-    // Start the simulation with the specified number of cars
     generateRandomRoads(numberOfCars);
 }
+
 void MainWindow::onPauseButtonClicked() {
     emit togglePauseSimulation();
 
-    // Optional: Update button text
     QObject *rootObject = ui->quickWidget_MapView->rootObject();
     QVariant returnedValue;
     QMetaObject::invokeMethod(rootObject, "isSimulationPaused",
                               Q_RETURN_ARG(QVariant, returnedValue));
     bool simulationPaused = returnedValue.toBool();
 
-    if (simulationPaused) {
-        ui->pauseButton->setText("Resume");
-    } else {
-        ui->pauseButton->setText("Pause");
-    }
+    ui->pauseButton->setText(simulationPaused ? "Resume" : "Pause");
 }
 
-// Slot pour redémarrer
 void MainWindow::onRestartClicked() {
-    qDebug() << "Redémarrage de la simulation";
-    // Ajouter ici votre logique pour redémarrer la simulation
-
-    // Clear the map
+    qDebug() << "Restarting simulation";
     generatedRoads.clear();
     emit clearMap();
     collisionSet.clear();
     ui->logListWidget->clear();
-    // Generate new roads
-    // generateRandomRoads(5);
-
 }
 
-// Slot pour récupérer la valeur du slider
 void MainWindow::onSliderValueChanged(int value) {
-    // Convert slider value (0-100) to speed multiplier (0.1 to 2.0)
     double speedMultiplier = 0.1 + (value / 100.0) * 1.9;
     QObject *rootObject = ui->quickWidget_MapView->rootObject();
     QMetaObject::invokeMethod(rootObject, "updateCarSpeeds",
                               Q_ARG(QVariant, QVariant::fromValue(speedMultiplier)));
 }
 
+void MainWindow::onToggleGridButtonClicked() {
+    emit toggleHexGrid();
+}
 
-void MainWindow::logCollision(int carIndex1, int carIndex2, qreal speed1, qreal frequency1, qreal speed2, qreal frequency2)
-{
-    // Normalize indices
+double MainWindow::calculateReceivedPower(double distance) {
+    double lambda = c / fc;  // Wavelength
+    double A = (lambda * lambda) / (4 * M_PI) * Gr;  // Effective antenna area
+
+    // Calculate received power using the formula:
+    // Pr = (PtGt/(4π*d^2)) * A = (λ^2/(4π*d)^2) * GtPtGr
+    double Pr = (pow(lambda, 2) / pow(4 * M_PI * distance, 2)) * Gt * Pt * Gr;
+
+    return Pr;
+}
+
+void MainWindow::checkSignalStrength(int carIndex1, int carIndex2, double distance) {
+    double powerLevel = calculateReceivedPower(distance);
+    double powerLeveldBm = 10 * log10(powerLevel * 1000);
+
+    QString message = QString("Signal strength between Car %1 and Car %2:\n"
+                              "Distance: %3 meters\n"
+                              "Received Power: %4 dBm")
+                          .arg(carIndex1 + 1)
+                          .arg(carIndex2 + 1)
+                          .arg(distance, 0, 'f', 1)
+                          .arg(powerLeveldBm, 0, 'f', 2);
+
+    if (powerLeveldBm > -90) {
+        ui->logListWidget->addItem(message);
+    }
+}
+
+void MainWindow::logCollision(int carIndex1, int carIndex2, qreal speed1, qreal frequency1, qreal speed2, qreal frequency2) {
     int minIndex = std::min(carIndex1, carIndex2);
     int maxIndex = std::max(carIndex1, carIndex2);
     QString pairKey = QString("%1-%2").arg(minIndex).arg(maxIndex);
@@ -145,26 +152,40 @@ void MainWindow::logCollision(int carIndex1, int carIndex2, qreal speed1, qreal 
     if (!collisionSet.contains(pairKey)) {
         collisionSet.insert(pairKey);
 
-        QString message = QString("Connection detected between car %1 and car %2{\n"
-                                  "  Car %1:\n"
-                                  "    Speed: %3 km/h\n"
-                                  "    Frequency: %4\n"
-                                  "  Car %2:\n"
-                                  "    Speed: %5 km/h\n"
-                                  "    Frequency: %6}")
+        // Get car positions
+        QObject *rootObject = ui->quickWidget_MapView->rootObject();
+        QVariant car1Pos, car2Pos;
+        QMetaObject::invokeMethod(rootObject, "getCarPosition",
+                                  Q_RETURN_ARG(QVariant, car1Pos),
+                                  Q_ARG(QVariant, carIndex1));
+        QMetaObject::invokeMethod(rootObject, "getCarPosition",
+                                  Q_RETURN_ARG(QVariant, car2Pos),
+                                  Q_ARG(QVariant, carIndex2));
+
+        QGeoCoordinate pos1 = car1Pos.value<QGeoCoordinate>();
+        QGeoCoordinate pos2 = car2Pos.value<QGeoCoordinate>();
+
+        double distance = pos1.distanceTo(pos2);
+        checkSignalStrength(carIndex1, carIndex2, distance);
+
+        QString message = QString("Connexion détectée entre la voiture %1 et la voiture %2{\n"
+                                  "  Voiture %1 :\n"
+                                  "    Vitesse : %3 km/h\n"
+                                  "    Fréquence : %4 GHz\n"
+                                  "  Voiture %2 :\n"
+                                  "    Vitesse : %5 km/h\n"
+                                  "    Fréquence : %6 GHz\n"
+                                  "}\n\n\n")
                               .arg(carIndex1 + 1)
                               .arg(carIndex2 + 1)
-                              .arg(speed1)
-                              .arg(frequency1)
-                              .arg(speed2)
-                              .arg(frequency2);
+                              .arg(speed1, 0, 'f', 0)
+                              .arg(frequency1*10, 0, 'f', 2)
+                              .arg(speed2, 0, 'f', 0)
+                              .arg(frequency2*10, 0, 'f', 2);
 
         ui->logListWidget->addItem(message);
     }
 }
-
-/*******************************************/
-
 
 void MainWindow::generateRandomRoads(int numberOfRoads) {
     constexpr double MIN_LAT = 47.72196;
@@ -200,8 +221,7 @@ void MainWindow::generateRandomRoads(int numberOfRoads) {
     }
 }
 
-void MainWindow::getRoute(double startLat, double startLong, double endLat, double endLong)
-{
+void MainWindow::getRoute(double startLat, double startLong, double endLat, double endLong) {
     QNetworkAccessManager *manager = new QNetworkAccessManager(this);
 
     QString url = QString("http://router.project-osrm.org/route/v1/driving/%1,%2;%3,%4?overview=full&geometries=geojson")
@@ -240,7 +260,6 @@ void MainWindow::getRoute(double startLat, double startLong, double endLat, doub
                 generatedRoads.append(geoPathCoordinates);
                 emit drawPathWithCoordinates(QVariant::fromValue(geoPathCoordinates));
 
-                // Add a car for this road immediately
                 QVariantList roadCoordinates;
                 for (const QGeoCoordinate &coord : geoPathCoordinates) {
                     roadCoordinates.append(QVariant::fromValue(coord));
@@ -261,9 +280,4 @@ void MainWindow::getRoute(double startLat, double startLong, double endLat, doub
         reply->deleteLater();
         manager->deleteLater();
     });
-}
-
-// Remove the addCarsToAllRoads() function as it's no longer needed
-void MainWindow::onToggleGridButtonClicked() {
-    emit toggleHexGrid();
 }

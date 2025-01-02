@@ -131,9 +131,9 @@ void MainWindow::checkSignalStrength(int carIndex1, int carIndex2, double distan
     double powerLevel = calculateReceivedPower(distance);
     double powerLeveldBm = 10 * log10(powerLevel * 1000);
 
-    QString message = QString("Signal strength between Car %1 and Car %2:\n"
-                              "Distance: %3 meters\n"
-                              "Received Power: %4 dBm")
+    QString message = QString("Puissance du signal entre la voiture %1 et la voiture %2 :\n"
+                              "Distance : %3 mètres\n"
+                              "Puissance reçue : %4 dBm")
                           .arg(carIndex1 + 1)
                           .arg(carIndex2 + 1)
                           .arg(distance, 0, 'f', 1)

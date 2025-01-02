@@ -63,6 +63,43 @@ Rectangle {
             path: window.polylinePoints
             z: 1
         }
+
+       /* MouseArea {
+                  anchors.fill: parent
+                  drag.target: mapview
+                  acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+                  onPressed: function(mouse) {
+                      drag.startX = mouse.x;
+                      drag.startY = mouse.y;
+                  }
+
+                  onReleased: {
+                      mapview.pan(mapview.center);
+                  }
+
+                  onPositionChanged: {
+                      if (drag.active) {
+                          var deltaLatitude = (mouseY - drag.startY) * 0.0001;
+                          var deltaLongitude = (mouseX - drag.startX) * 0.0001;
+                          mapview.center = QtPositioning.coordinate(mapview.center.latitude + deltaLatitude, mapview.center.longitude - deltaLongitude);
+                      }
+                  }
+
+                  onDoubleClicked: {
+                      window.zoomLevel += 1;
+                      mapview.zoomLevel = window.zoomLevel;
+                  }
+
+                  onWheel: function(event) {
+                      if (event.angleDelta.y > 0) {
+                          window.zoomLevel += 1;
+                      } else {
+                          window.zoomLevel -= 1;
+                      }
+                      mapview.zoomLevel = window.zoomLevel;
+                  }
+              }*/
     }
 
     // ==================== Components ====================
@@ -202,7 +239,7 @@ Rectangle {
 
                 carItems[carIndex].coordinate = interpolatedPosition
                 carCircles[carIndex].center = interpolatedPosition
-                checkCollisions(carIndex)
+                checkCollisions()
                 pathIndices[carIndex] = pathIndex + 1
             } else {
                 timer.stop()
@@ -247,7 +284,7 @@ Rectangle {
         // Create collision pair key
         var pairKey = i < j ? i + "-" + j : j + "-" + i
 
-        // Emit collision signal if new
+        // Emit collision signal if detected
         if (collisionPairs.indexOf(pairKey) === -1) {
             collisionPairs.push(pairKey)
             collisionDetected(i, j, carSpeeds[i], carFrequencies[i],

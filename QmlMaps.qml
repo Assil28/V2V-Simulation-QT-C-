@@ -130,7 +130,7 @@ Rectangle {
         carPaths.push(coordinates);
 
         var speed = 60 + Math.random() * 60;
-        var frequency = (3.5 + Math.random() * 12.5)/10;
+        var frequency = (3.5 + Math.random() * 22.5)/10;
 
         carSpeeds.push(speed);
         carFrequencies.push(frequency);

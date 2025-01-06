@@ -32,7 +32,7 @@
      <rect>
       <x>100</x>
       <y>0</y>
-      <width>951</width>
+      <width>687</width>
       <height>31</height>
      </rect>
     </property>
@@ -50,7 +50,7 @@
      <item>
       <widget class="QPushButton" name="pushButton_2">
        <property name="text">
-        <string>Demarrer la simulation</string>
+        <string>Démarrer</string>
        </property>
       </widget>
      </item>
@@ -71,14 +71,21 @@
      <item>
       <widget class="QPushButton" name="pushButton">
        <property name="text">
-        <string>nettoyer la map</string>
+        <string>Nettoyer la map</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="toggleGridButton">
        <property name="text">
-        <string>Afficher/Cacher Grille</string>
+        <string>Afficher/Cacher la Grille</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="toggleLogButton">
+       <property name="text">
+        <string>Cacher la Liste</string>
        </property>
       </widget>
      </item>
@@ -90,7 +97,7 @@
       <x>1080</x>
       <y>0</y>
       <width>371</width>
-      <height>751</height>
+      <height>731</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -102,7 +109,7 @@
           <x>0</x>
           <y>-50</y>
           <width>371</width>
-          <height>791</height>
+          <height>781</height>
          </rect>
         </property>
         <property name="styleSheet">
@@ -117,12 +124,12 @@
            <x>0</x>
            <y>50</y>
            <width>371</width>
-           <height>741</height>
+           <height>721</height>
           </rect>
          </property>
          <property name="styleSheet">
           <string>
-                background-color: rgba(0, 0, 0, 60);  /* Black with transparency */
+                background-color: rgba(0, 0, 0, 40);  /* Black with transparency */
                 color: white;  /* White text */
             </string>
          </property>
@@ -139,7 +146,7 @@
      <x>0</x>
      <y>0</y>
      <width>1451</width>
-     <height>19</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>

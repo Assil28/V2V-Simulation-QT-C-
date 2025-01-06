@@ -58,5 +58,6 @@ public slots:
 
 private slots:
     void onToggleGridButtonClicked();
+    void onToggleLogButtonClicked();
 };
 #endif // MAINWINDOW_H

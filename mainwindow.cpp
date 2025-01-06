@@ -42,12 +42,15 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, SIGNAL(toggleHexGrid()),
             rootObject, SLOT(toggleHexGrid()));
 
-    // Connect UI elements
+    // Connect UI elements (buttons and slider)
     connect(ui->pushButton_2, &QPushButton::clicked, this, &MainWindow::onStartSimulationClicked);
     connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::onRestartClicked);
     connect(ui->pauseButton, &QPushButton::clicked, this, &MainWindow::onPauseButtonClicked);
     connect(ui->horizontalSlider, &QSlider::valueChanged, this, &MainWindow::onSliderValueChanged);
+
+    //Afficher et cacher
     connect(ui->toggleGridButton, &QPushButton::clicked, this, &MainWindow::onToggleGridButtonClicked);
+    connect(ui->toggleLogButton, &QPushButton::clicked, this, &MainWindow::onToggleLogButtonClicked);
 
     // Set up QML context
     ui->quickWidget_MapView->rootContext()->setContextProperty("mainWindow", this);
@@ -114,6 +117,23 @@ void MainWindow::onSliderValueChanged(int value) {
 
 void MainWindow::onToggleGridButtonClicked() {
     emit toggleHexGrid();
+}
+
+// Slot function to toggle the visibility of the log panel (panelWidget)
+void MainWindow::onToggleLogButtonClicked()
+{
+    // Check the current visibility status of panelWidget
+    bool isVisible = ui->panelWidget->isVisible();
+
+    // Toggle the visibility of panelWidget, which contains logListWidget
+    ui->panelWidget->setVisible(!isVisible);
+
+    // Update the button text based on the visibility state
+    if (isVisible) {
+        ui->toggleLogButton->setText("Afficher la Liste");
+    } else {
+        ui->toggleLogButton->setText("Cacher La liste");
+    }
 }
 
 double MainWindow::calculateReceivedPower(double distance) {
@@ -281,3 +301,5 @@ void MainWindow::getRoute(double startLat, double startLong, double endLat, doub
         manager->deleteLater();
     });
 }
+
+

@@ -7,6 +7,8 @@ Rectangle {
     width: 800
     height: 600
 
+
+    // ==================== Property Declarations ====================
     // Propriétés de la carte
     property double latitude: 47.729679
     property double longitude: 7.321515
@@ -32,10 +34,15 @@ Rectangle {
     property real animationDuration: 20000
     property var collisionPairs: []
     property real speedMultiplier: 1.0
+
+    // Grid properties
     property bool hexGridVisible: true
 
+      // ==================== Signals ====================
     signal collisionDetected(int carIndex1, int carIndex2, real speed1, real frequency1, real speed2, real frequency2)
 
+
+    // ==================== Map Configuration ====================
     Plugin {
         id: mapPlugin
         name: "osm"
@@ -95,7 +102,39 @@ Rectangle {
                       }
     }
 
-    // Fonctions pour gérer la carte et les éléments
+
+    // ==================== Components ====================
+        Component {
+            id: carComponent
+            MapQuickItem {
+                anchorPoint.x: carImage.width / 2
+                anchorPoint.y: carImage.height / 2
+                sourceItem: Image {
+                    id: carImage
+                    source: "car.svg"
+                    width: 32
+                    height: 32
+                }
+            }
+        }
+
+        Component {
+            id: locmaker
+            MapQuickItem {
+                id: markerImg
+            }
+        }
+
+        HexagonalGrid {
+            id: hexGrid
+            anchors.fill: parent
+            z: 1
+            visible: hexGridVisible
+        }
+
+
+
+// Fonctions pour gérer la carte et les éléments
     function setCenterPosition(lati, longi) {
         mapview.center = QtPositioning.coordinate(lati, longi)
     }
@@ -126,18 +165,22 @@ Rectangle {
         mapItems.push(borderPolyline);
     }
 
+     // ==================== Car Functions ====================
     function addCarPath(coordinates) {
         carPaths.push(coordinates);
 
+        // Generate random properties
         var speed = 60 + Math.random() * 60;
-        var frequency = (3.5 + Math.random() * 12.5)/10;
+        var frequency = (3.5 + Math.random() * 22.5)/10;
 
+         // Add car properties
         carSpeeds.push(speed);
         carFrequencies.push(frequency);
         carActive.push(true);
 
         var speedMultiplier = speed / 60;
 
+         // Create car item
         var carItem = carComponent.createObject(mapview, {
             coordinate: coordinates[0],
             z: 2
@@ -148,10 +191,13 @@ Rectangle {
             return;
         }
 
+        // Add car to map
         mapview.addMapItem(carItem);
         carItems.push(carItem);
         mapItems.push(carItem);
 
+
+        // Create and add circle
         var circleRadius = baseCircleRadius * speedMultiplier * frequency;
         var circleItem = Qt.createQmlObject('import QtLocation 5.0; MapCircle {}', mapview);
         circleItem.center = coordinates[0];
@@ -165,6 +211,8 @@ Rectangle {
         carActive.push(true);
         mapItems.push(circleItem);
 
+
+        // Start animation
         animateCarAlongPath(carItems.length - 1, speedMultiplier, frequency);
         console.log("Car added at index:", carItems.length - 1);
     }
@@ -198,6 +246,8 @@ Rectangle {
         });
         timer.start();
     }
+
+    // ==================== Simulation Control Functions ===================
     function updateCarSpeeds(multiplier) {
         speedMultiplier = multiplier;
         for (var i = 0; i < carTimers.length; i++) {
@@ -206,12 +256,16 @@ Rectangle {
             }
         }
     }
+
+   // ==================== Connexion Functions ====================
     function checkCollisions() {
+        // Reset all circles to default color
         for (var i = 0; i < carCircles.length; i++) {
             carCircles[i].color = Qt.rgba(0, 1, 0, 0.2);
             carCircles[i].border.color = "green";
         }
 
+        // Check collisions between all active cars
         for (var i = 0; i < carCircles.length; i++) {
             for (var j = i + 1; j < carCircles.length; j++) {
                 var distance = carCircles[i].center.distanceTo(carCircles[j].center);
@@ -264,28 +318,36 @@ Rectangle {
 
 
     function clearMap() {
+
+        // Stop and clean up timers
         for (var i = 0; i < carTimers.length; i++) {
             carTimers[i].stop();
             carTimers[i].destroy();
         }
         carTimers = [];
 
+        // Remove and clean up map items
         for (var i = 0; i < mapItems.length; i++) {
             mapview.removeMapItem(mapItems[i]);
             mapItems[i].destroy();
         }
         mapItems = [];
 
+        // Remove and clean up car circles
         for (var i = 0; i < carCircles.length; i++) {
             mapview.removeMapItem(carCircles[i]);
             carCircles[i].destroy();
         }
+
+         // Reset all arrays
         carCircles = [];
         carRadii = [];
         carActive = [];
         carItems = [];
         carPaths = [];
         collisionPairs = [];
+
+        // Reset hex grid if exists
         if (hexGrid) {
             hexGrid.resetGrid();
         }
@@ -295,33 +357,9 @@ Rectangle {
         hexGridVisible = !hexGridVisible;
     }
 
+    // Connect collision signal to main window
     onCollisionDetected: mainWindow.logCollision(carIndex1, carIndex2, speed1, frequency1, speed2, frequency2)
 
-    Component {
-        id: carComponent
-        MapQuickItem {
-            anchorPoint.x: carImage.width / 2
-            anchorPoint.y: carImage.height / 2
-            sourceItem: Image {
-                id: carImage
-                source: "car.svg"
-                width: 32
-                height: 32
-            }
-        }
-    }
 
-    Component {
-        id: locmaker
-        MapQuickItem {
-            id: markerImg
-        }
-    }
 
-    HexagonalGrid {
-        id: hexGrid
-        anchors.fill: parent
-        z: 1
-        visible: hexGridVisible
-    }
 }

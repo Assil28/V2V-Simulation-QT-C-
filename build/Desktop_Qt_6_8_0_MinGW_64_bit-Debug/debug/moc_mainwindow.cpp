@@ -46,13 +46,31 @@ constexpr auto qt_meta_stringdata_CLASSMainWindowENDCLASS = QtMocHelpers::string
     "setLocationMarking",
     "drawPathWithCoordinates",
     "coordinates",
+    "addCarPath",
+    "clearMap",
+    "toggleHexGrid",
+    "togglePauseSimulation",
     "getRoute",
     "startLat",
     "startLong",
     "endLat",
     "endLong",
     "generateRandomRoads",
-    "numberOfRoads"
+    "numberOfRoads",
+    "onStartSimulationClicked",
+    "onRestartClicked",
+    "onPauseButtonClicked",
+    "onSliderValueChanged",
+    "value",
+    "logCollision",
+    "carIndex1",
+    "carIndex2",
+    "speed1",
+    "frequency1",
+    "speed2",
+    "frequency2",
+    "onToggleGridButtonClicked",
+    "onToggleLogButtonClicked"
 );
 #else  // !QT_MOC_HAS_STRINGDATA
 #error "qtmochelpers.h not found or too old."
@@ -65,30 +83,52 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSMainWindowENDCLASS[] = {
       12,       // revision
        0,       // classname
        0,    0, // classinfo
-       5,   14, // methods
+      16,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       3,       // signalCount
+       7,       // signalCount
 
  // signals: name, argc, parameters, tag, flags, initial metatype offsets
-       1,    2,   44,    2, 0x06,    1 /* Public */,
-       4,    2,   49,    2, 0x06,    4 /* Public */,
-       5,    1,   54,    2, 0x06,    7 /* Public */,
+       1,    2,  110,    2, 0x06,    1 /* Public */,
+       4,    2,  115,    2, 0x06,    4 /* Public */,
+       5,    1,  120,    2, 0x06,    7 /* Public */,
+       7,    1,  123,    2, 0x06,    9 /* Public */,
+       8,    0,  126,    2, 0x06,   11 /* Public */,
+       9,    0,  127,    2, 0x06,   12 /* Public */,
+      10,    0,  128,    2, 0x06,   13 /* Public */,
 
  // slots: name, argc, parameters, tag, flags, initial metatype offsets
-       7,    4,   57,    2, 0x0a,    9 /* Public */,
-      12,    1,   66,    2, 0x0a,   14 /* Public */,
+      11,    4,  129,    2, 0x0a,   14 /* Public */,
+      16,    1,  138,    2, 0x0a,   19 /* Public */,
+      18,    0,  141,    2, 0x0a,   21 /* Public */,
+      19,    0,  142,    2, 0x0a,   22 /* Public */,
+      20,    0,  143,    2, 0x0a,   23 /* Public */,
+      21,    1,  144,    2, 0x0a,   24 /* Public */,
+      23,    6,  147,    2, 0x0a,   26 /* Public */,
+      30,    0,  160,    2, 0x08,   33 /* Private */,
+      31,    0,  161,    2, 0x08,   34 /* Private */,
 
  // signals: parameters
     QMetaType::Void, 0x80000000 | 3, 0x80000000 | 3,    2,    2,
     QMetaType::Void, 0x80000000 | 3, 0x80000000 | 3,    2,    2,
     QMetaType::Void, 0x80000000 | 3,    6,
+    QMetaType::Void, 0x80000000 | 3,    6,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
 
  // slots: parameters
-    QMetaType::Void, QMetaType::Double, QMetaType::Double, QMetaType::Double, QMetaType::Double,    8,    9,   10,   11,
-    QMetaType::Void, QMetaType::Int,   13,
+    QMetaType::Void, QMetaType::Double, QMetaType::Double, QMetaType::Double, QMetaType::Double,   12,   13,   14,   15,
+    QMetaType::Void, QMetaType::Int,   17,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void, QMetaType::Int,   22,
+    QMetaType::Void, QMetaType::Int, QMetaType::Int, QMetaType::QReal, QMetaType::QReal, QMetaType::QReal, QMetaType::QReal,   24,   25,   26,   27,   28,   29,
+    QMetaType::Void,
+    QMetaType::Void,
 
        0        // eod
 };
@@ -113,6 +153,15 @@ Q_CONSTINIT const QMetaObject MainWindow::staticMetaObject = { {
         // method 'drawPathWithCoordinates'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         QtPrivate::TypeAndForceComplete<QVariant, std::false_type>,
+        // method 'addCarPath'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        QtPrivate::TypeAndForceComplete<QVariant, std::false_type>,
+        // method 'clearMap'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        // method 'toggleHexGrid'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        // method 'togglePauseSimulation'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'getRoute'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         QtPrivate::TypeAndForceComplete<double, std::false_type>,
@@ -121,7 +170,28 @@ Q_CONSTINIT const QMetaObject MainWindow::staticMetaObject = { {
         QtPrivate::TypeAndForceComplete<double, std::false_type>,
         // method 'generateRandomRoads'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        QtPrivate::TypeAndForceComplete<int, std::false_type>
+        QtPrivate::TypeAndForceComplete<int, std::false_type>,
+        // method 'onStartSimulationClicked'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        // method 'onRestartClicked'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        // method 'onPauseButtonClicked'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        // method 'onSliderValueChanged'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        QtPrivate::TypeAndForceComplete<int, std::false_type>,
+        // method 'logCollision'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        QtPrivate::TypeAndForceComplete<int, std::false_type>,
+        QtPrivate::TypeAndForceComplete<int, std::false_type>,
+        QtPrivate::TypeAndForceComplete<qreal, std::false_type>,
+        QtPrivate::TypeAndForceComplete<qreal, std::false_type>,
+        QtPrivate::TypeAndForceComplete<qreal, std::false_type>,
+        QtPrivate::TypeAndForceComplete<qreal, std::false_type>,
+        // method 'onToggleGridButtonClicked'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        // method 'onToggleLogButtonClicked'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>
     >,
     nullptr
 } };
@@ -135,8 +205,19 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 0: _t->setCenterPosition((*reinterpret_cast< std::add_pointer_t<QVariant>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<QVariant>>(_a[2]))); break;
         case 1: _t->setLocationMarking((*reinterpret_cast< std::add_pointer_t<QVariant>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<QVariant>>(_a[2]))); break;
         case 2: _t->drawPathWithCoordinates((*reinterpret_cast< std::add_pointer_t<QVariant>>(_a[1]))); break;
-        case 3: _t->getRoute((*reinterpret_cast< std::add_pointer_t<double>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<double>>(_a[2])),(*reinterpret_cast< std::add_pointer_t<double>>(_a[3])),(*reinterpret_cast< std::add_pointer_t<double>>(_a[4]))); break;
-        case 4: _t->generateRandomRoads((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
+        case 3: _t->addCarPath((*reinterpret_cast< std::add_pointer_t<QVariant>>(_a[1]))); break;
+        case 4: _t->clearMap(); break;
+        case 5: _t->toggleHexGrid(); break;
+        case 6: _t->togglePauseSimulation(); break;
+        case 7: _t->getRoute((*reinterpret_cast< std::add_pointer_t<double>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<double>>(_a[2])),(*reinterpret_cast< std::add_pointer_t<double>>(_a[3])),(*reinterpret_cast< std::add_pointer_t<double>>(_a[4]))); break;
+        case 8: _t->generateRandomRoads((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
+        case 9: _t->onStartSimulationClicked(); break;
+        case 10: _t->onRestartClicked(); break;
+        case 11: _t->onPauseButtonClicked(); break;
+        case 12: _t->onSliderValueChanged((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
+        case 13: _t->logCollision((*reinterpret_cast< std::add_pointer_t<int>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<int>>(_a[2])),(*reinterpret_cast< std::add_pointer_t<qreal>>(_a[3])),(*reinterpret_cast< std::add_pointer_t<qreal>>(_a[4])),(*reinterpret_cast< std::add_pointer_t<qreal>>(_a[5])),(*reinterpret_cast< std::add_pointer_t<qreal>>(_a[6]))); break;
+        case 14: _t->onToggleGridButtonClicked(); break;
+        case 15: _t->onToggleLogButtonClicked(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -162,6 +243,34 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
                 return;
             }
         }
+        {
+            using _t = void (MainWindow::*)(QVariant );
+            if (_t _q_method = &MainWindow::addCarPath; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
+                *result = 3;
+                return;
+            }
+        }
+        {
+            using _t = void (MainWindow::*)();
+            if (_t _q_method = &MainWindow::clearMap; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
+                *result = 4;
+                return;
+            }
+        }
+        {
+            using _t = void (MainWindow::*)();
+            if (_t _q_method = &MainWindow::toggleHexGrid; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
+                *result = 5;
+                return;
+            }
+        }
+        {
+            using _t = void (MainWindow::*)();
+            if (_t _q_method = &MainWindow::togglePauseSimulation; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
+                *result = 6;
+                return;
+            }
+        }
     }
 }
 
@@ -184,13 +293,13 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 5)
+        if (_id < 16)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 5;
+        _id -= 16;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 5)
+        if (_id < 16)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 5;
+        _id -= 16;
     }
     return _id;
 }
@@ -214,5 +323,30 @@ void MainWindow::drawPathWithCoordinates(QVariant _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
     QMetaObject::activate(this, &staticMetaObject, 2, _a);
+}
+
+// SIGNAL 3
+void MainWindow::addCarPath(QVariant _t1)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    QMetaObject::activate(this, &staticMetaObject, 3, _a);
+}
+
+// SIGNAL 4
+void MainWindow::clearMap()
+{
+    QMetaObject::activate(this, &staticMetaObject, 4, nullptr);
+}
+
+// SIGNAL 5
+void MainWindow::toggleHexGrid()
+{
+    QMetaObject::activate(this, &staticMetaObject, 5, nullptr);
+}
+
+// SIGNAL 6
+void MainWindow::togglePauseSimulation()
+{
+    QMetaObject::activate(this, &staticMetaObject, 6, nullptr);
 }
 QT_WARNING_POP

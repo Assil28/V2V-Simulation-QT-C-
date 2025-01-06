@@ -4,11 +4,8 @@ Item {
     id: hexGrid
     anchors.fill: parent
 
-    // Propriétés de la grille
     property int baseRadius: 30
     property int radius: Math.max(20, Math.min(60, baseRadius * Math.pow(2, (mapview.zoomLevel - 15) / 3)))
-
-     // Maintenant on stocke le nombre de voitures par hexagone
     property var hexagonCarCounts: ({})
     property var carPreviousHexagons: ({})
     property var mapCenter: mapview.center
@@ -17,6 +14,9 @@ Item {
     property real baseZoomLevel: 15
     property bool isUpdating: false
     property bool gridVisible: true
+
+    // Ajout d'une propriété pour forcer le premier rendu
+    property bool initialized: false
 
     Connections {
         target: mapview
@@ -38,6 +38,22 @@ Item {
         }
     }
 
+    Component.onCompleted: {
+        // Force l'initialisation immédiate
+        initialized = true;
+        Qt.callLater(function() {
+            updateGridPosition();
+            resetGrid();
+            // Force le rendu de tous les hexagones
+            for (let i = 0; i < repeater.count; i++) {
+                let item = repeater.itemAt(i);
+                if (item && item.children[0]) {
+                    item.children[0].requestPaint();
+                }
+            }
+        });
+    }
+
     Timer {
         id: updateTimer
         interval: 150
@@ -49,7 +65,19 @@ Item {
         }
     }
 
-    // Fonction pour vérifier si un point est dans un hexagone
+    // Timer pour s'assurer que la grille est visible au démarrage
+    Timer {
+        interval: 100
+        running: true
+        repeat: false
+        onTriggered: {
+            if (!isUpdating) {
+                updateGridPosition();
+                resetGrid();
+            }
+        }
+    }
+
     function isPointInHexagon(px, py, hexX, hexY) {
         let dx = Math.abs(px - hexX)
         let dy = Math.abs(py - hexY)
@@ -70,7 +98,6 @@ Item {
         };
     }
 
-// Fonction pour mettre à jour l'état d'un hexagone spécifique
     function updateHexagonWithCar(hexIndex, carId, isInside) {
         if (!hexagonCarCounts[hexIndex]) {
             hexagonCarCounts[hexIndex] = new Set();
@@ -86,7 +113,6 @@ Item {
 
         let isEmpty = hexagonCarCounts[hexIndex].size === 0;
 
-    // Si l'état a changé, on demande un nouveau rendu
         if (wasEmpty !== isEmpty) {
             let item = repeater.itemAt(hexIndex);
             if (item) {
@@ -96,6 +122,8 @@ Item {
     }
 
     function updateGridPosition() {
+        if (!initialized) return;
+
         let centerPoint = mapview.fromCoordinate(mapview.center);
         mapOffset = Qt.point(
             (hexGrid.width / 2) - centerPoint.x,
@@ -108,14 +136,16 @@ Item {
                 let pos = getHexagonPosition(i);
                 item.x = pos.x + mapOffset.x;
                 item.y = pos.y + mapOffset.y;
+                // Force le rendu de l'hexagone
+                if (item.children[0]) {
+                    item.children[0].requestPaint();
+                }
             }
         }
     }
 
-
-    // Fonction pour mettre à jour tous les hexagones pour une voiture
     function updateHexagonsForCar(carX, carY, carId) {
-        if (isUpdating) return;
+        if (isUpdating || !initialized) return;
 
         let adjustedX = carX - mapOffset.x;
         let adjustedY = carY - mapOffset.y;
@@ -159,13 +189,14 @@ Item {
         carPreviousHexagons[carId] = currentHexagons;
     }
 
-    // Fonction pour réinitialiser la grille
     function resetGrid() {
+        if (!initialized) return;
+
         hexagonCarCounts = {};
         carPreviousHexagons = {};
         for (let i = 0; i < repeater.count; i++) {
             let item = repeater.itemAt(i);
-            if (item) {
+            if (item && item.children[0]) {
                 item.children[0].requestPaint();
             }
         }
@@ -179,7 +210,7 @@ Item {
             id: hexItem
             width: radius * 2
             height: radius * Math.sqrt(3)
-            visible: hexGrid.gridVisible
+            visible: hexGrid.gridVisible && hexGrid.initialized
 
             Canvas {
                 id: hexCanvas
@@ -207,15 +238,11 @@ Item {
                     }
                     ctx.closePath();
 
-                    // Colorer l'hexagone en fonction du nombre de voitures
                     if (hexagonCarCounts[index] && hexagonCarCounts[index].size > 0) {
-
-                        // Intensité basée sur le nombre de voitures
                         let intensity = Math.min(hexagonCarCounts[index].size * 0.3, 1.0);
                         ctx.fillStyle = Qt.rgba(1.0, 0, 1.0, intensity);
                         ctx.fill();
 
-                // Afficher le nombre de voitures
                         ctx.fillStyle = "white";
                         ctx.font = Math.floor(radius/3) + "px Arial";
                         ctx.textAlign = "center";
@@ -233,19 +260,15 @@ Item {
         }
     }
 
-
-// Timer pour la mise à jour périodique
     Timer {
         interval: 100
-        running: true
+        running: initialized
         repeat: true
         onTriggered: {
             if (!isUpdating) {
-                // Pour chaque voiture sur la carte
                 for (let i = 0; i < carItems.length; i++) {
                     let car = carItems[i];
                     if (car && car.coordinate) {
-                        // Convertir les coordonnées GPS en coordonnées d'écran
                         let point = mapview.fromCoordinate(car.coordinate, false);
                         updateHexagonsForCar(point.x, point.y, "car_" + i);
                     }

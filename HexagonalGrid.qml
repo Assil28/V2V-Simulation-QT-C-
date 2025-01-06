@@ -4,19 +4,17 @@ Item {
     id: hexGrid
     anchors.fill: parent
 
-    // Propriétés de base
     property int baseRadius: 30
     property int radius: Math.max(20, Math.min(60, baseRadius * Math.pow(2, (mapview.zoomLevel - 15) / 3)))
     property var hexagonCarCounts: ({})
+    property var carPreviousHexagons: ({})
     property var mapCenter: mapview.center
     property real mapZoomLevel: mapview.zoomLevel
     property point mapOffset: Qt.point(0, 0)
     property real baseZoomLevel: 15
-
-    // Propriété pour éviter les mises à jour trop fréquentes
     property bool isUpdating: false
+    property bool gridVisible: true
 
-    // Connexion avec la carte
     Connections {
         target: mapview
 
@@ -37,10 +35,9 @@ Item {
         }
     }
 
-    // Timer pour éviter les mises à jour trop fréquentes
     Timer {
         id: updateTimer
-        interval: 150 // Délai pour regrouper les mises à jour
+        interval: 150
         running: false
         repeat: false
         onTriggered: {
@@ -52,10 +49,8 @@ Item {
     function isPointInHexagon(px, py, hexX, hexY) {
         let dx = Math.abs(px - hexX)
         let dy = Math.abs(py - hexY)
-
         let r = radius
         let h = r * Math.sqrt(3) / 2
-
         return (dx <= r / 2) && (dy <= h) ||
                (dx <= r) && (dy <= h / 2)
     }
@@ -116,8 +111,8 @@ Item {
 
         let adjustedX = carX - mapOffset.x;
         let adjustedY = carY - mapOffset.y;
+        let currentHexagons = new Set();
 
-        // Optimisation : ne vérifier que les hexagones proches
         let col = Math.floor(adjustedX / (radius * 1.5));
         let row = Math.floor(adjustedY / (radius * Math.sqrt(3)));
         let checkRange = 2;
@@ -137,8 +132,32 @@ Item {
                     );
 
                     let isInside = isPointInHexagon(carX, carY, hexCenter.x, hexCenter.y);
-                    updateHexagonWithCar(index, carId, isInside);
+                    if (isInside) {
+                        currentHexagons.add(index);
+                        updateHexagonWithCar(index, carId, true);
+                    }
                 }
+            }
+        }
+
+        if (carPreviousHexagons[carId]) {
+            carPreviousHexagons[carId].forEach(hexIndex => {
+                if (!currentHexagons.has(hexIndex)) {
+                    updateHexagonWithCar(hexIndex, carId, false);
+                }
+            });
+        }
+
+        carPreviousHexagons[carId] = currentHexagons;
+    }
+
+    function resetGrid() {
+        hexagonCarCounts = {};
+        carPreviousHexagons = {};
+        for (let i = 0; i < repeater.count; i++) {
+            let item = repeater.itemAt(i);
+            if (item) {
+                item.children[0].requestPaint();
             }
         }
     }
@@ -151,6 +170,7 @@ Item {
             id: hexItem
             width: radius * 2
             height: radius * Math.sqrt(3)
+            visible: hexGrid.gridVisible
 
             Canvas {
                 id: hexCanvas
@@ -199,7 +219,6 @@ Item {
             }
         }
     }
-    //timer
 
     Timer {
         interval: 100
@@ -214,16 +233,6 @@ Item {
                         updateHexagonsForCar(point.x, point.y, "car_" + i);
                     }
                 }
-            }
-        }
-    }
-
-    function resetGrid() {
-        hexagonCarCounts = {};
-        for (let i = 0; i < repeater.count; i++) {
-            let item = repeater.itemAt(i);
-            if (item) {
-                item.children[0].requestPaint();
             }
         }
     }

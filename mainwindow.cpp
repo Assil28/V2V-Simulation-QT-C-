@@ -130,36 +130,6 @@ void MainWindow::onSliderValueChanged(int value) {
 }
 
 
-void MainWindow::logCollision(int carIndex1, int carIndex2, qreal speed1, qreal frequency1, qreal speed2, qreal frequency2)
-{
-    // Normalize indices
-    int minIndex = std::min(carIndex1, carIndex2);
-    int maxIndex = std::max(carIndex1, carIndex2);
-    QString pairKey = QString("%1-%2").arg(minIndex).arg(maxIndex);
-
-    if (!collisionSet.contains(pairKey)) {
-        collisionSet.insert(pairKey);
-
-        QString message = QString("Connection detected between car %1 and car %2{\n"
-                                  "  Car %1:\n"
-                                  "    Speed: %3 km/h\n"
-                                  "    Frequency: %4\n"
-                                  "  Car %2:\n"
-                                  "    Speed: %5 km/h\n"
-                                  "    Frequency: %6\n"
-                                  "}"
-                                  )
-                              .arg(carIndex1 + 1)
-                              .arg(carIndex2 + 1)
-                              .arg(speed1)
-                              .arg(frequency1)
-                              .arg(speed2)
-                              .arg(frequency2);
-
-        ui->logListWidget->addItem(message);
-    }
-}
-
 /*******************************************/
 
 
@@ -262,6 +232,81 @@ void MainWindow::getRoute(double startLat, double startLong, double endLat, doub
 
 void MainWindow::onToggleGridButtonClicked() {
     emit toggleHexGrid();
+}
+
+
+// Calcule la puissance reçue en fonction de la distance en utilisant la formule de propagation de l'onde.
+double MainWindow::calculateReceivedPower(double distance) {
+    double lambda = c / fc;  // Wavelength
+    double A = (lambda * lambda) / (4 * M_PI) * Gr;  // Effective antenna area
+
+    // Calculate received power using the formula:
+    // Pr = (PtGt/(4π*d^2)) * A = (λ^2/(4π*d)^2) * GtPtGr
+    double Pr = (pow(lambda, 2) / pow(4 * M_PI * distance, 2)) * Gt * Pt * Gr;
+
+    return Pr;
+}
+
+// Vérifie la puissance du signal entre deux voitures et l'affiche si la puissance reçue est supérieure à -90 dBm.
+void MainWindow::checkSignalStrength(int carIndex1, int carIndex2, double distance) {
+    double powerLevel = calculateReceivedPower(distance);
+    double powerLeveldBm = 10 * log10(powerLevel * 1000);
+
+    QString message = QString("Puissance du signal entre la voiture %1 et la voiture %2 :\n"
+                              "Distance : %3 mètres\n"
+                              "Puissance reçue : %4 dBm")
+                          .arg(carIndex1 + 1)
+                          .arg(carIndex2 + 1)
+                          .arg(distance, 0, 'f', 1)
+                          .arg(powerLeveldBm, 0, 'f', 2);
+
+    if (powerLeveldBm > -90) {
+        ui->logListWidget->addItem(message);
+    }
+}
+
+// Enregistre un message de collision entre deux voitures et vérifie la puissance du signal entre elles.
+void MainWindow::logCollision(int carIndex1, int carIndex2, qreal speed1, qreal frequency1, qreal speed2, qreal frequency2) {
+    int minIndex = std::min(carIndex1, carIndex2);
+    int maxIndex = std::max(carIndex1, carIndex2);
+    QString pairKey = QString("%1-%2").arg(minIndex).arg(maxIndex);
+
+    if (!collisionSet.contains(pairKey)) {
+        collisionSet.insert(pairKey);
+
+        // Get car positions
+        QObject *rootObject = ui->quickWidget_MapView->rootObject();
+        QVariant car1Pos, car2Pos;
+        QMetaObject::invokeMethod(rootObject, "getCarPosition",
+                                  Q_RETURN_ARG(QVariant, car1Pos),
+                                  Q_ARG(QVariant, carIndex1));
+        QMetaObject::invokeMethod(rootObject, "getCarPosition",
+                                  Q_RETURN_ARG(QVariant, car2Pos),
+                                  Q_ARG(QVariant, carIndex2));
+
+        QGeoCoordinate pos1 = car1Pos.value<QGeoCoordinate>();
+        QGeoCoordinate pos2 = car2Pos.value<QGeoCoordinate>();
+
+        double distance = pos1.distanceTo(pos2);
+        checkSignalStrength(carIndex1, carIndex2, distance);
+
+        QString message = QString("Connexion détectée entre la voiture %1 et la voiture %2{\n"
+                                  "  Voiture %1 :\n"
+                                  "    Vitesse : %3 km/h\n"
+                                  "    Fréquence : %4 GHz\n"
+                                  "  Voiture %2 :\n"
+                                  "    Vitesse : %5 km/h\n"
+                                  "    Fréquence : %6 GHz\n"
+                                  "}\n\n\n")
+                              .arg(carIndex1 + 1)
+                              .arg(carIndex2 + 1)
+                              .arg(speed1, 0, 'f', 0)
+                              .arg(frequency1*10, 0, 'f', 2)
+                              .arg(speed2, 0, 'f', 0)
+                              .arg(frequency2*10, 0, 'f', 2);
+
+        ui->logListWidget->addItem(message);
+    }
 }
 
 // Slot function to toggle the visibility of the log panel (panelWidget)

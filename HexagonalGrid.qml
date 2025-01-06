@@ -15,6 +15,9 @@ Item {
     property bool isUpdating: false
     property bool gridVisible: true
 
+    // Ajout d'une propriété pour forcer le premier rendu
+    property bool initialized: false
+
     Connections {
         target: mapview
 
@@ -35,6 +38,22 @@ Item {
         }
     }
 
+    Component.onCompleted: {
+        // Force l'initialisation immédiate
+        initialized = true;
+        Qt.callLater(function() {
+            updateGridPosition();
+            resetGrid();
+            // Force le rendu de tous les hexagones
+            for (let i = 0; i < repeater.count; i++) {
+                let item = repeater.itemAt(i);
+                if (item && item.children[0]) {
+                    item.children[0].requestPaint();
+                }
+            }
+        });
+    }
+
     Timer {
         id: updateTimer
         interval: 150
@@ -43,6 +62,19 @@ Item {
         onTriggered: {
             updateGridPosition();
             isUpdating = false;
+        }
+    }
+
+    // Timer pour s'assurer que la grille est visible au démarrage
+    Timer {
+        interval: 100
+        running: true
+        repeat: false
+        onTriggered: {
+            if (!isUpdating) {
+                updateGridPosition();
+                resetGrid();
+            }
         }
     }
 
@@ -90,6 +122,8 @@ Item {
     }
 
     function updateGridPosition() {
+        if (!initialized) return;
+
         let centerPoint = mapview.fromCoordinate(mapview.center);
         mapOffset = Qt.point(
             (hexGrid.width / 2) - centerPoint.x,
@@ -102,12 +136,16 @@ Item {
                 let pos = getHexagonPosition(i);
                 item.x = pos.x + mapOffset.x;
                 item.y = pos.y + mapOffset.y;
+                // Force le rendu de l'hexagone
+                if (item.children[0]) {
+                    item.children[0].requestPaint();
+                }
             }
         }
     }
 
     function updateHexagonsForCar(carX, carY, carId) {
-        if (isUpdating) return;
+        if (isUpdating || !initialized) return;
 
         let adjustedX = carX - mapOffset.x;
         let adjustedY = carY - mapOffset.y;
@@ -152,11 +190,13 @@ Item {
     }
 
     function resetGrid() {
+        if (!initialized) return;
+
         hexagonCarCounts = {};
         carPreviousHexagons = {};
         for (let i = 0; i < repeater.count; i++) {
             let item = repeater.itemAt(i);
-            if (item) {
+            if (item && item.children[0]) {
                 item.children[0].requestPaint();
             }
         }
@@ -170,7 +210,7 @@ Item {
             id: hexItem
             width: radius * 2
             height: radius * Math.sqrt(3)
-            visible: hexGrid.gridVisible
+            visible: hexGrid.gridVisible && hexGrid.initialized
 
             Canvas {
                 id: hexCanvas
@@ -222,7 +262,7 @@ Item {
 
     Timer {
         interval: 100
-        running: true
+        running: initialized
         repeat: true
         onTriggered: {
             if (!isUpdating) {

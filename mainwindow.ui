@@ -83,12 +83,12 @@
       </widget>
      </item>
      <item>
-        <widget class="QPushButton" name="toggleLogButton">
-            <property name="text">
-            <string>Hide List</string>
-            </property>
-        </widget>
-    </item>
+      <widget class="QPushButton" name="toggleLogButton">
+       <property name="text">
+        <string>List</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </widget>
    <widget class="QWidget" name="verticalLayoutWidget">
